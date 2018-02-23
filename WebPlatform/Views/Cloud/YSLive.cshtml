@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewBag.Title = "荧石设备实时画面";
+
+    System.Data.DataTable ysLiveList = ViewBag.ysLiveList;
+
+    Dictionary<string, string> dicStatus = new Dictionary<string, string>();
+    //0-正常，1-设备不在线，2-设备开启视频加密，3-设备删除，4-失效，5-未绑定，6-账户下流量已超出
+    dicStatus.Add("0", "正常");
+    dicStatus.Add("1", "不在线");
+    dicStatus.Add("2", "开启视频加密");
+    dicStatus.Add("3", "已删除");
+    dicStatus.Add("4", "失效");
+    dicStatus.Add("5", "未绑定");
+    dicStatus.Add("6", "流量已超出");
+
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <h3 class="box-title">荧石摄像头</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body text-center">
+                <div class="row">
+                    @foreach (System.Data.DataRow dr in ysLiveList.Rows)
+                    {
+                        if (@dr["exception"].ToString() == "0")
+                        {
+                            <div class="col-md-4">
+                                <div class="small-box bg-aqua">
+                                    <div class="inner">
+                                        <h3>设备号：@dr["deviceSerial"]</h3>
+                                        <p>@dicStatus[@dr["exception"].ToString()]</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="ion ion-android-camera"></i>
+                                    </div>
+                                    <a href="@Url.Action("YSLiveVideo","Cloud",new { serialNo = dr["deviceSerial"].ToString() })" class="small-box-footer">打开直播 <i class="fa fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-4">
+                                <div class="small-box bg-red">
+                                    <div class="inner">
+                                        <h3>设备号：@dr["deviceSerial"]</h3>
+                                        <p>@dicStatus[@dr["exception"].ToString()]</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="ion ion-android-camera"></i>
+                                    </div>
+                                    <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                                </div>
+                            </div>
+                        }
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

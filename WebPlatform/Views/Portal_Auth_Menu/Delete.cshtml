@@ -1,0 +1,40 @@
+﻿@model WebPlatform.Models.Portal_Auth_Menu
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Portal_Auth_Menu</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.AuthID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AuthID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MenuID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MenuID)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>
