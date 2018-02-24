@@ -27,6 +27,7 @@ namespace WebPlatform
                       "~/Scripts/respond.js",
                       "~/AdminLTE/bower_components/Switch/bootstrapSwitch.js",
                       "~/AdminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js",
+                      "~/AdminLTE/bower_components/Chart.js/Chart.js",
                       "~/AdminLTE/bower_components/fastclick/lib/fastclick.js",
                       "~/AdminLTE/dist/js/adminlte.min.js",
                       "~/AdminLTE/dist/js/demo.js"));
