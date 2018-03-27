@@ -50,5 +50,46 @@ namespace WebPlatform.Controllers
 
             return View();
         }
+
+        [HttpPost]
+        public ActionResult YSLiveVideoMulti()
+        {
+            YsAPI ys = new YsAPI("1f03ba35bf5d4c92af54a6cd2ee1fe3e", "ecc176d67e0d57f654ec35caa3095cef");
+
+            int splitNum = 0;
+
+            DataTable ysLiveList = ys.getLiveLists();
+            Dictionary<int, string[]> liveAddressList = new Dictionary<int, string[]>();
+
+            Dictionary<int, string> serialNos = new Dictionary<int, string>();
+
+            foreach (DataRow dr in ysLiveList.Rows)
+            {
+                foreach(KeyValuePair<int ,string> sno in serialNos)
+                {
+                    if(sno.Value == dr["deviceSerial"].ToString())
+                    {
+                        liveAddressList.Add(sno.Key, new string[2] { dr["hdAddress"].ToString(), dr["rtmpHd"].ToString() });
+                    }
+                }
+            }
+
+            ViewBag.liveAddressList = liveAddressList;
+            ViewBag.splitNum = splitNum;
+
+            return View();
+        }
+
+        public ActionResult YSLiveVideoMultiSet(int splitNum)
+        {
+            YsAPI ys = new YsAPI("1f03ba35bf5d4c92af54a6cd2ee1fe3e", "ecc176d67e0d57f654ec35caa3095cef");
+
+            DataTable ysLiveList = ys.getLiveLists();
+
+            ViewBag.ysLiveList = ysLiveList;
+            ViewBag.splitNum = splitNum;
+
+            return View();
+        }
     }
 }
