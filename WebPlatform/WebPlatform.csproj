@@ -189,6 +189,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="BLL\BLLHelper.cs" />
     <Compile Include="BLL\HTTPHelper.cs" />
     <Compile Include="CloudAPI\YsAPI.cs" />
     <Compile Include="Controllers\AccountController.cs" />
