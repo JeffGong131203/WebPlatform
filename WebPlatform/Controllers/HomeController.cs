@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 using WebPlatform.Models;
 
 namespace WebPlatform.Controllers
@@ -33,6 +34,29 @@ namespace WebPlatform.Controllers
             {
                 if (loginpsw == portal_User.Loginpsw)
                 {
+                    string role = string.Empty;
+
+                    var authList = db.Portal_Auth.Join(db.Portal_Auth_User, a => a.ID, u => u.AuthID, (a, u) => new { a.AuthCode, a.AuthName, u.UserID }).Where(user => user.UserID == portal_User.ID).ToList();
+                    for(int i=0;i<authList.Count();i++)
+                    {
+                        if (i == 0)
+                        {
+                            role = authList[i].AuthName;
+                        }
+                        else
+                        {
+                            role += "," + authList[i].AuthName;
+                        }
+                    }
+         
+                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1,portal_User.Loginno,DateTime.Now,DateTime.Now.AddMinutes(800),true,role);
+                    string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
+
+                    HttpCookie _cookie = new HttpCookie("User");
+
+                    _cookie.Values.Add("UserID",HttpUtility.UrlEncode(portal_User.ID.ToString()));
+                    Response.Cookies.Add(_cookie);
+
                     return View("Index");
                 }
                 else
@@ -46,7 +70,7 @@ namespace WebPlatform.Controllers
             }
 
             return View();
-            
+
         }
 
         public ActionResult Contact()

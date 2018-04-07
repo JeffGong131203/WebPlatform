@@ -33,6 +33,80 @@ namespace WebPlatform.Controllers
             return new Guid(userid);
         }
 
+        private void GetUserYSAccount(out string accountID,out string appKey,out string secret)
+        {
+            accountID = appKey = secret = string.Empty;
+
+            Guid uid = GetUserID();
+
+            IEnumerable<Cloud_YS_User> ysUserList = db.Cloud_YS_User.Where(userid => userid.UserID == uid).ToList();
+            if (ysUserList.Count() > 0)
+            {
+                appKey = ysUserList.ToList()[0].YsAppKey;
+                secret = ysUserList.ToList()[0].YsSecret;
+                accountID = ysUserList.ToList()[0].YsAccount;
+            }
+        }
+        
+        /// <summary>
+        /// 萤石子账号管理Get
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "admin")]
+        public ActionResult YSAccountManage(int pageStart = 0,int pageSize=10)
+        {
+            YsAPI ys;
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
+            ys = new YsAPI(appKey, secret);
+
+            int total = 0;
+            int page = 0;
+            int size = 0;
+
+            string retJstr = ys.getSubAccountLists(pageStart, pageSize, out total, out page, out size);
+
+            ViewBag.SubAccountList = retJstr;
+
+            return View();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
+        public ActionResult YSAccountManage()
+        {
+            string accountName = Request.Form["accountName"];
+            string accountPsw = Request.Form["accountPsw"];
+            string[] devlist = Request.Form["devlist"].Split(",".ToCharArray());
+
+            YsAPI ys;
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
+            ys = new YsAPI(appKey, secret);
+
+            string retMsg = string.Empty;
+
+            accountID = ys.addSubAccount(accountName,accountPsw);
+            if(!string.IsNullOrEmpty(accountID))
+            {
+                retMsg = ys.SetSubAccountPolicy(accountID, new string[] { }, devlist);
+            }
+            else
+            {
+                retMsg = "萤石子账号创建失败";
+            }
+
+            ViewBag.errMsg = retMsg;
+
+            return View();
+        }
+
         //获取萤石直播设备列表
         /// <summary>
         /// 获取萤石直播设备列表
@@ -42,17 +116,21 @@ namespace WebPlatform.Controllers
         {
             YsAPI ys;
 
-            IEnumerable<Cloud_YS_User> ysUserList = db.Cloud_YS_User.Where(userid => userid.UserID == GetUserID()).ToList();
-            string appKey = ysUserList.ToList()[0].YsAppKey;
-            string secret = ysUserList.ToList()[0].YsSecret;
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
 
             //为空则是子账号
-            if(string.IsNullOrEmpty(appKey) && string.IsNullOrEmpty(secret))
+            if (string.IsNullOrEmpty(appKey) && string.IsNullOrEmpty(secret))
             {
-                
+                ys = new YsAPI(accountID);
             }
-
-            ys = new YsAPI("1f03ba35bf5d4c92af54a6cd2ee1fe3e", "ecc176d67e0d57f654ec35caa3095cef");
+            else
+            {
+                ys = new YsAPI(appKey,secret);
+            }
 
             DataTable ysLiveList = ys.getLiveLists();
 
@@ -69,7 +147,23 @@ namespace WebPlatform.Controllers
         /// <returns></returns>
         public ActionResult YSLiveVideo(string serialNo)
         {
-            YsAPI ys = new YsAPI("1f03ba35bf5d4c92af54a6cd2ee1fe3e", "ecc176d67e0d57f654ec35caa3095cef");
+            YsAPI ys;
+
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
+
+            //为空则是子账号
+            if (string.IsNullOrEmpty(appKey) && string.IsNullOrEmpty(secret))
+            {
+                ys = new YsAPI(accountID);
+            }
+            else
+            {
+                ys = new YsAPI(appKey, secret);
+            }
 
             DataTable ysLiveList = ys.getLiveLists();
 
@@ -98,7 +192,23 @@ namespace WebPlatform.Controllers
         [HttpPost]
         public ActionResult YSLiveVideoMulti()
         {
-            YsAPI ys = new YsAPI("1f03ba35bf5d4c92af54a6cd2ee1fe3e", "ecc176d67e0d57f654ec35caa3095cef");
+            YsAPI ys;
+
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
+
+            //为空则是子账号
+            if (string.IsNullOrEmpty(appKey) && string.IsNullOrEmpty(secret))
+            {
+                ys = new YsAPI(accountID);
+            }
+            else
+            {
+                ys = new YsAPI(appKey, secret);
+            }
 
             int splitNum = 0;
 
@@ -106,6 +216,26 @@ namespace WebPlatform.Controllers
             Dictionary<int, string[]> liveAddressList = new Dictionary<int, string[]>();
 
             Dictionary<int, string> serialNos = new Dictionary<int, string>();
+
+            for (int i = 0; i < Request.Form.AllKeys.Count(); i++)
+            {
+                string key = Request.Form.AllKeys[i];
+                if ( key== "splitNum")
+                {
+                    splitNum = int.Parse(Request.Form[key]);
+                }
+                else
+                {
+                    if(key.Contains("SEL_"))
+                    {
+                        int snoInd = int.Parse(key.Split("_".ToArray())[1]);
+
+                        string sno = Request.Form[key];
+
+                        serialNos.Add(snoInd, sno);
+                    }
+                }
+            }
 
             foreach (DataRow dr in ysLiveList.Rows)
             {
@@ -133,7 +263,23 @@ namespace WebPlatform.Controllers
         /// <returns></returns>
         public ActionResult YSLiveVideoMultiSet(int splitNum)
         {
-            YsAPI ys = new YsAPI("1f03ba35bf5d4c92af54a6cd2ee1fe3e", "ecc176d67e0d57f654ec35caa3095cef");
+            YsAPI ys;
+
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
+
+            //为空则是子账号
+            if (string.IsNullOrEmpty(appKey) && string.IsNullOrEmpty(secret))
+            {
+                ys = new YsAPI(accountID);
+            }
+            else
+            {
+                ys = new YsAPI(appKey, secret);
+            }
 
             DataTable ysLiveList = ys.getLiveLists();
 

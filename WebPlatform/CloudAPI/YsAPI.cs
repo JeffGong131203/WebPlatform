@@ -43,7 +43,7 @@ namespace WebPlatform.CloudAPI
         /// 获取AccessToken
         /// </summary>
         /// <returns></returns>
-        public string getAccessToken()
+        public string getAccessToken(bool isSub)
         {
 
             string url = "https://open.ys7.com/api/lapp/token/get";
@@ -66,7 +66,7 @@ namespace WebPlatform.CloudAPI
             }
 
             //获取子账号AccessToken
-            if (string.IsNullOrEmpty(_subAccountID))
+            if (string.IsNullOrEmpty(_subAccountID) && isSub)
             {
                 url = "https://open.ys7.com/api/lapp/ram/token/get";
 
@@ -95,9 +95,33 @@ namespace WebPlatform.CloudAPI
         /// <param name="accountName"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public string addSubAccount(string accountName,string password)
+        public string addSubAccount(string accountName, string password)
         {
             string accountID = string.Empty;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/ram/account/create";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("accountName", accountName);
+                parameters.Add("password", BLLHelper.UserMd5(_appKey + "#" + password).ToLower());
+
+                string retStr = string.Empty;
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                if (jStr["code"].ToString() == "200")
+                {
+                    accountID = jStr["data"]["accountId"].ToString();
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
 
             return accountID;
         }
@@ -109,29 +133,153 @@ namespace WebPlatform.CloudAPI
         /// <param name="permisson"></param>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public string SetSubAccountPolicy(string accountID,string[] permisson,string[] resource)
+        public string SetSubAccountPolicy(string accountID, string[] permisson, string[] resource)
         {
-            string retCode = string.Empty;
+            string retMsg = string.Empty;
 
-            return retCode;
+            //string policy = "{ "Statement": [{ "Permission": "Get,Real",  "Resource": ["dev: 126044895","dev: C03225730"]}]}";
+            string policy = @"{ ""Statement"": [{ ""Permission"": ""{0}"",  ""Resource"": [{1}]}]}";
+
+            string strPermission = string.Empty;
+            string strResource = string.Empty;
+
+            if (permisson.Count() > 0)
+            {
+                for (int i = 0; i < permisson.Count(); i++)
+                {
+                    if (i == 0)
+                    {
+                        strPermission = permisson[i];
+                    }
+                    else
+                    {
+                        strPermission += "," + permisson[i];
+                    }
+                }
+            }
+            else
+            {
+                strPermission = "Get,Real";
+            }
+
+            if (resource.Count() > 0)
+            {
+                for (int i = 0; i < resource.Count(); i++)
+                {
+                    if (i == 0)
+                    {
+                        strResource = string.Format(@"""dev: {0}""", resource[i]);
+                    }
+                    else
+                    {
+                        strResource += "," + string.Format(@"""dev: {0}""", resource[i]);
+                    }
+                }
+            }
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/ram/policy/set";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("accountId", accountID);
+                parameters.Add("policy", string.Format(policy, strPermission, strResource));
+
+                string retStr = string.Empty;
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                if (jStr["code"].ToString() == "200")
+                {
+                    retMsg = jStr["msg"].ToString();
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return retMsg;
         }
 
+        /// <summary>
+        /// 获取所有子账户列表
+        /// </summary>
+        /// <returns></returns>
+        public string getSubAccountLists(int pageStart,int pageSize, out int total,out int page,out int size)
+        {
+            string retStr = string.Empty;
+
+            total = 0;
+            page = 0;
+            size = 0;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/ram/account/list";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                if(pageStart == 0 && pageSize ==0)
+                {
+
+                }
+                else
+                {
+                    parameters.Add("pageStart",pageStart.ToString());
+                    parameters.Add("pageSize", pageSize.ToString());
+                }
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                if (jStr["code"].ToString() == "200")
+                {
+                    retStr = jStr.ToString();
+                    total = int.Parse(jStr["page"]["total"].ToString());
+                    page = int.Parse(jStr["page"]["page"].ToString());
+                    size = int.Parse(jStr["page"]["size"].ToString());
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return retStr;
+        }
 
         /// <summary>
         /// 获取设备列表
         /// </summary>
         /// <returns></returns>
-        public DataTable getDeviceLists()
+        public DataTable getDeviceLists(int pageStart, int pageSize, out int total, out int page, out int size)
         {
             DataTable dtList = new DataTable();
+            
+            total = 0;
+            page = 0;
+            size = 0;
 
-            string accessToken = getAccessToken();
+            string accessToken = getAccessToken(false);
             if (!string.IsNullOrEmpty(accessToken))
             {
                 string url = "https://open.ys7.com/api/lapp/device/list";
 
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 parameters.Add("accessToken", accessToken);
+                if (pageStart == 0 && pageSize == 0)
+                {
+
+                }
+                else
+                {
+                    parameters.Add("pageStart", pageStart.ToString());
+                    parameters.Add("pageSize", pageSize.ToString());
+
+                }
 
                 string retStr = string.Empty;
 
@@ -140,6 +288,9 @@ namespace WebPlatform.CloudAPI
                 if (jStr["code"].ToString() == "200")
                 {
                     dtList = JsonConvert.DeserializeObject<DataTable>(jStr["data"].ToString());
+                    total = int.Parse(jStr["page"]["total"].ToString());
+                    page = int.Parse(jStr["page"]["page"].ToString());
+                    size = int.Parse(jStr["page"]["size"].ToString());
                 }
                 else //API Error,Write Log
                 {
@@ -158,7 +309,7 @@ namespace WebPlatform.CloudAPI
         {
             DataTable dtList = new DataTable();
 
-            string accessToken = getAccessToken();
+            string accessToken = getAccessToken(true);
             if (!string.IsNullOrEmpty(accessToken))
             {
                 string url = "https://open.ys7.com/api/lapp/live/video/list";

@@ -7516,6 +7516,8 @@
     <Content Include="Views\Shared\_LayoutSingle.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Cloud\YSLiveVideoMultiSet.cshtml" />
+    <Content Include="Views\Cloud\YSAccountManage.cshtml" />
+    <Content Include="Views\Cloud\YSLiveVideoMulti.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

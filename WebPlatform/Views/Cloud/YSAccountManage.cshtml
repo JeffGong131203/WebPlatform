@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "萤石子账号管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>萤石子账号管理</h2>
+
+<div class="login-box-body">
+    <p class="login-box-msg">添加萤石子账号</p>
+    <form action="@Url.Action("YSAccountManage","Cloud")" method="post">
+        <div class="form-group has-feedback">
+            <input name="accountName" type="text" class="form-control" placeholder="账号名">
+            <span class="glyphicon glyphicon-cloud form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            <input name="accountPsw" type="password" class="form-control" placeholder="密码">
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            <input name="devlist" type="text" class="form-control" placeholder="设备号：逗号分隔">
+            <span class="glyphicon glyphicon-cloud form-control-feedback"></span>
+        </div>
+        <div class="row">
+            <!-- /.col -->
+            <div class="col-xs-4">
+                <button type="submit" class="btn btn-primary btn-block btn-flat">添加</button>
+            </div>
+            <!-- /.col -->
+        </div>
+    </form>
+
+    <div class="social-auth-links text-center">
+        <p>@ViewBag.errMsg</p>
+
+    </div>
+
+</div>
+@ViewBag.SubAccountList
