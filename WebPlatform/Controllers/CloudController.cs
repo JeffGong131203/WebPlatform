@@ -112,6 +112,7 @@ namespace WebPlatform.Controllers
         /// 获取萤石直播设备列表
         /// </summary>
         /// <returns></returns>
+        [Authorize]
         public ActionResult YSLive()
         {
             YsAPI ys;
@@ -145,6 +146,7 @@ namespace WebPlatform.Controllers
         /// </summary>
         /// <param name="serialNo"></param>
         /// <returns></returns>
+        [Authorize]
         public ActionResult YSLiveVideo(string serialNo)
         {
             YsAPI ys;
@@ -190,6 +192,7 @@ namespace WebPlatform.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
+        [Authorize]
         public ActionResult YSLiveVideoMulti()
         {
             YsAPI ys;
@@ -261,6 +264,7 @@ namespace WebPlatform.Controllers
         /// </summary>
         /// <param name="splitNum"></param>
         /// <returns></returns>
+        [Authorize]
         public ActionResult YSLiveVideoMultiSet(int splitNum)
         {
             YsAPI ys;

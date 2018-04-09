@@ -1,0 +1,58 @@
+﻿@model IEnumerable<WebPlatform.Models.Cloud_YS_User>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UserID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.YsAccount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.YsPsw)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.YsAppKey)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.YsSecret)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.YsAccount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.YsPsw)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.YsAppKey)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.YsSecret)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>

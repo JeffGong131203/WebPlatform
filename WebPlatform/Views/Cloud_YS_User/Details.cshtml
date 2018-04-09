@@ -1,0 +1,59 @@
+﻿@model WebPlatform.Models.Cloud_YS_User
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Cloud_YS_User</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.YsAccount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.YsAccount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.YsPsw)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.YsPsw)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.YsAppKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.YsAppKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.YsSecret)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.YsSecret)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

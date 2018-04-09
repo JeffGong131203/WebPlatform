@@ -12,6 +12,7 @@ namespace WebPlatform.Controllers
     {
         private WebPlatformContext db = new WebPlatformContext();
 
+        [Authorize]
         public ActionResult Index()
         {
             return View();
@@ -51,10 +52,14 @@ namespace WebPlatform.Controllers
          
                     FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1,portal_User.Loginno,DateTime.Now,DateTime.Now.AddMinutes(800),true,role);
                     string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
+                    //FormsAuthentication.SetAuthCookie()
+                    System.Web.HttpCookie authCookie = new System.Web.HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+                    System.Web.HttpContext.Current.Response.Cookies.Add(authCookie);
 
                     HttpCookie _cookie = new HttpCookie("User");
 
                     _cookie.Values.Add("UserID",HttpUtility.UrlEncode(portal_User.ID.ToString()));
+                    _cookie.Values.Add("Loginno", HttpUtility.UrlEncode(portal_User.Loginno));
                     Response.Cookies.Add(_cookie);
 
                     return View("Index");
@@ -71,6 +76,20 @@ namespace WebPlatform.Controllers
 
             return View();
 
+        }
+
+        public ActionResult Logout()
+        {
+            if (Request.Cookies["User"] != null)
+            {
+                HttpCookie _cookie = Request.Cookies["User"];
+                _cookie.Expires = DateTime.Now.AddHours(-1);
+                Response.Cookies.Add(_cookie);
+            }
+
+            FormsAuthentication.SignOut();
+
+            return View("Login");
         }
 
         public ActionResult Contact()

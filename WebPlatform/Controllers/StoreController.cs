@@ -15,12 +15,14 @@ namespace WebPlatform.Controllers
         private WebPlatformContext db = new WebPlatformContext();
 
         // GET: Store
+        [Authorize(Roles = "admin")]
         public ActionResult Index()
         {
             return View(db.Portal_Customer_Store.ToList());
         }
 
         // GET: Store/Details/5
+        [Authorize(Roles = "admin")]
         public ActionResult Details(Guid? id)
         {
             if (id == null)
@@ -36,6 +38,7 @@ namespace WebPlatform.Controllers
         }
 
         // GET: Store/Create
+        [Authorize(Roles = "admin")]
         public ActionResult Create()
         {
             return View();
@@ -46,6 +49,7 @@ namespace WebPlatform.Controllers
         // 详细信息，请参阅 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult Create([Bind(Include = "ID,AreaID,StoreCode,StoreName")] Portal_Customer_Store portal_Customer_Store)
         {
             if (ModelState.IsValid)
@@ -60,6 +64,7 @@ namespace WebPlatform.Controllers
         }
 
         // GET: Store/Edit/5
+        [Authorize(Roles = "admin")]
         public ActionResult Edit(Guid? id)
         {
             if (id == null)
@@ -79,6 +84,7 @@ namespace WebPlatform.Controllers
         // 详细信息，请参阅 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult Edit([Bind(Include = "ID,AreaID,StoreCode,StoreName")] Portal_Customer_Store portal_Customer_Store)
         {
             if (ModelState.IsValid)
@@ -91,6 +97,7 @@ namespace WebPlatform.Controllers
         }
 
         // GET: Store/Delete/5
+        [Authorize(Roles = "admin")]
         public ActionResult Delete(Guid? id)
         {
             if (id == null)
@@ -108,6 +115,7 @@ namespace WebPlatform.Controllers
         // POST: Store/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult DeleteConfirmed(Guid id)
         {
             Portal_Customer_Store portal_Customer_Store = db.Portal_Customer_Store.Find(id);

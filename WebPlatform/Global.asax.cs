@@ -30,7 +30,7 @@ namespace WebPlatform
             var id = Context.User.Identity as FormsIdentity;
             if (id != null && id.IsAuthenticated)
             {
-                var roles = id.Ticket.UserData.Split(',');
+                var roles = id.Ticket.UserData.Split(",".ToArray());
                 Context.User = new GenericPrincipal(id, roles);
             }
         }

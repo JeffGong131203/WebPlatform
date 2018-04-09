@@ -15,12 +15,14 @@ namespace WebPlatform.Controllers
         private WebPlatformContext db = new WebPlatformContext();
 
         // GET: Portal_Auth_Menu
+        [Authorize(Roles = "admin")]
         public ActionResult Index()
         {
             return View(db.Portal_Auth_Menu.ToList());
         }
 
         // GET: Portal_Auth_Menu/Details/5
+        [Authorize(Roles = "admin")]
         public ActionResult Details(Guid? id)
         {
             if (id == null)
@@ -36,6 +38,7 @@ namespace WebPlatform.Controllers
         }
 
         // GET: Portal_Auth_Menu/Create
+        [Authorize(Roles = "admin")]
         public ActionResult Create()
         {
             return View();
@@ -46,6 +49,7 @@ namespace WebPlatform.Controllers
         // 详细信息，请参阅 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult Create([Bind(Include = "ID,AuthID,MenuID")] Portal_Auth_Menu portal_Auth_Menu)
         {
             if (ModelState.IsValid)
@@ -60,6 +64,7 @@ namespace WebPlatform.Controllers
         }
 
         // GET: Portal_Auth_Menu/Edit/5
+        [Authorize(Roles = "admin")]
         public ActionResult Edit(Guid? id)
         {
             if (id == null)
@@ -79,6 +84,7 @@ namespace WebPlatform.Controllers
         // 详细信息，请参阅 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult Edit([Bind(Include = "ID,AuthID,MenuID")] Portal_Auth_Menu portal_Auth_Menu)
         {
             if (ModelState.IsValid)
@@ -91,6 +97,7 @@ namespace WebPlatform.Controllers
         }
 
         // GET: Portal_Auth_Menu/Delete/5
+        [Authorize(Roles = "admin")]
         public ActionResult Delete(Guid? id)
         {
             if (id == null)
@@ -108,6 +115,7 @@ namespace WebPlatform.Controllers
         // POST: Portal_Auth_Menu/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult DeleteConfirmed(Guid id)
         {
             Portal_Auth_Menu portal_Auth_Menu = db.Portal_Auth_Menu.Find(id);

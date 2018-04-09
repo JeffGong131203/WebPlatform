@@ -18,7 +18,7 @@
     <AssemblyName>WebPlatform</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -196,6 +196,7 @@
     <Compile Include="Controllers\AreaController.cs" />
     <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\CloudController.cs" />
+    <Compile Include="Controllers\Cloud_YS_UserController.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -7518,6 +7519,11 @@
     <Content Include="Views\Cloud\YSLiveVideoMultiSet.cshtml" />
     <Content Include="Views\Cloud\YSAccountManage.cshtml" />
     <Content Include="Views\Cloud\YSLiveVideoMulti.cshtml" />
+    <Content Include="Views\Cloud_YS_User\Create.cshtml" />
+    <Content Include="Views\Cloud_YS_User\Delete.cshtml" />
+    <Content Include="Views\Cloud_YS_User\Details.cshtml" />
+    <Content Include="Views\Cloud_YS_User\Edit.cshtml" />
+    <Content Include="Views\Cloud_YS_User\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -7563,7 +7569,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>64177</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:64177/</IISUrl>
+          <IISUrl>http://localhost:8888/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
