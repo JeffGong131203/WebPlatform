@@ -41,6 +41,14 @@ namespace WebPlatform.Controllers
         [Authorize(Roles = "admin")]
         public ActionResult Create()
         {
+            var areaList = db.Portal_Customer_Area.ToList();
+            var selectList = new SelectList(areaList, "ID", "AreaName");
+            var selectItemList = new List<SelectListItem>();
+
+            selectItemList.AddRange(selectList);
+
+            ViewBag.areaList = selectItemList;
+
             return View();
         }
 
@@ -55,6 +63,9 @@ namespace WebPlatform.Controllers
             if (ModelState.IsValid)
             {
                 portal_Customer_Store.ID = Guid.NewGuid();
+
+                portal_Customer_Store.AreaID = new Guid(Request.Form["areaList"]);
+
                 db.Portal_Customer_Store.Add(portal_Customer_Store);
                 db.SaveChanges();
                 return RedirectToAction("Index");

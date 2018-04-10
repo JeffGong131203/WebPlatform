@@ -1,39 +1,48 @@
 ﻿@model IEnumerable<WebPlatform.Models.Portal_Auth_User>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "平台用户权限设置";
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
 }
 
-<h2>Index</h2>
+<h2>平台用户权限设置</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("添加权限", "Create",new { userid = ViewBag.userID})
 </p>
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.AuthID)
         </th>
+        <th>权限名称</th>
         <th>
             @Html.DisplayNameFor(model => model.UserID)
         </th>
+        <th>用户名称</th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.AuthID)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserID)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AuthID)
+            </td>
+            <td>
+                @db.Portal_Auth.Find(item.AuthID).AuthName
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserID)
+            </td>
+            <td>
+                @db.Portal_User.Find(item.UserID).Loginno
+            </td>
+            <td>
+                @Html.ActionLink("删除", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
 
 </table>

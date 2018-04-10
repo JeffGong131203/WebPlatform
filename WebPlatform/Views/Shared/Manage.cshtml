@@ -1,0 +1,40 @@
+﻿<li class="treeview">
+    <a href="#">
+        <i class="fa fa-share"></i> <span> 系统管理</span>
+        <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+        </span>
+    </a>
+    <ul class="treeview-menu">
+        <li><a href="@Url.Action("Index", "User")"><i class="fa fa-circle-o text-aqua"></i> <span> 用户管理</span></a></li>
+
+        <li class="treeview">
+            <a href="#">
+                <i class="fa fa-share"></i> <span> 客户管理</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="@Url.Action("Index", "Customer")"><i class="fa fa-circle-o text-aqua"></i> <span> 客户名称</span></a></li>
+                <li><a href="@Url.Action("Index", "Area")"><i class="fa fa-circle-o text-aqua"></i> <span> 大区管理</span></a></li>
+                <li><a href="@Url.Action("Index", "Store")"><i class="fa fa-circle-o text-aqua"></i> <span> 门店管理</span></a></li>
+            </ul>
+        </li>
+
+        <li class="treeview">
+            <a href="#">
+                <i class="fa fa-share"></i> <span> 萤石云管理</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="@Url.Action("YSAccountManage", "Cloud")"><i class="fa fa-circle-o text-aqua"></i> <span> 子账户管理</span></a></li>
+                <li><a href="@Url.Action("Index", "Cloud_YS_User")"><i class="fa fa-circle-o text-aqua"></i> <span> 子账户分配</span></a></li>
+
+            </ul>
+        </li>
+    </ul>
+</li>
+

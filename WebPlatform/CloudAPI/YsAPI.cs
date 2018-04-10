@@ -66,7 +66,7 @@ namespace WebPlatform.CloudAPI
             }
 
             //获取子账号AccessToken
-            if (string.IsNullOrEmpty(_subAccountID) && isSub)
+            if (!string.IsNullOrEmpty(_subAccountID) && isSub)
             {
                 url = "https://open.ys7.com/api/lapp/ram/token/get";
 
@@ -208,7 +208,7 @@ namespace WebPlatform.CloudAPI
         /// 获取所有子账户列表
         /// </summary>
         /// <returns></returns>
-        public string getSubAccountLists(int pageStart,int pageSize, out int total,out int page,out int size)
+        public string getSubAccountLists(int pageStart, int pageSize, out int total, out int page, out int size)
         {
             string retStr = string.Empty;
 
@@ -223,13 +223,13 @@ namespace WebPlatform.CloudAPI
 
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 parameters.Add("accessToken", accessToken);
-                if(pageStart == 0 && pageSize ==0)
+                if (pageStart == 0 && pageSize == 0)
                 {
 
                 }
                 else
                 {
-                    parameters.Add("pageStart",pageStart.ToString());
+                    parameters.Add("pageStart", pageStart.ToString());
                     parameters.Add("pageSize", pageSize.ToString());
                 }
 
@@ -255,13 +255,13 @@ namespace WebPlatform.CloudAPI
         /// 获取设备列表
         /// </summary>
         /// <returns></returns>
-        public DataTable getDeviceLists(int pageStart, int pageSize, out int total, out int page, out int size)
+        public DataTable getDeviceLists(int pageStart, int pageSize)
         {
             DataTable dtList = new DataTable();
-            
-            total = 0;
-            page = 0;
-            size = 0;
+
+            int total = 0;
+            int page = 0;
+            int size = 0;
 
             string accessToken = getAccessToken(false);
             if (!string.IsNullOrEmpty(accessToken))
@@ -272,7 +272,8 @@ namespace WebPlatform.CloudAPI
                 parameters.Add("accessToken", accessToken);
                 if (pageStart == 0 && pageSize == 0)
                 {
-
+                    parameters.Add("pageStart", 0.ToString());
+                    parameters.Add("pageSize", 10.ToString());
                 }
                 else
                 {
@@ -291,6 +292,26 @@ namespace WebPlatform.CloudAPI
                     total = int.Parse(jStr["page"]["total"].ToString());
                     page = int.Parse(jStr["page"]["page"].ToString());
                     size = int.Parse(jStr["page"]["size"].ToString());
+
+                    while (total > (page + 1) * size)
+                    {
+                        parameters["pageStart"] = (page + 1).ToString();
+
+                        jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+                        DataTable dt = new DataTable();
+
+                        var retData = jStr["data"];
+
+                        if (retData != null)
+                        {
+                            dt = JsonConvert.DeserializeObject<DataTable>(jStr["data"].ToString());
+                            dtList.Merge(dt);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
                 else //API Error,Write Log
                 {

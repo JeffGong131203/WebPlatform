@@ -2,17 +2,22 @@
 
 @{
     ViewBag.Title = "Index";
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
 }
 
-<h2>Index</h2>
+<h2>客户大区信息</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("创建", "Create")
 </p>
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.CusID)
+        </th>
+        <th>
+            客户名称
         </th>
         <th>
             @Html.DisplayNameFor(model => model.AreaCode)
@@ -29,15 +34,17 @@
             @Html.DisplayFor(modelItem => item.CusID)
         </td>
         <td>
+            @db.Portal_Customer.Find(item.CusID).CusName
+        </td>
+        <td>
             @Html.DisplayFor(modelItem => item.AreaCode)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.AreaName)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+            @Html.ActionLink("编辑", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("删除", "Delete", new { id=item.ID })
         </td>
     </tr>
 }

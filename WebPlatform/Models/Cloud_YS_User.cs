@@ -8,7 +8,7 @@ namespace WebPlatform.Models
     {
         [DisplayName("ID")]
         public System.Guid ID { get; set; }
-        [DisplayName("用户")]
+        [DisplayName("用户ID")]
         public Nullable<System.Guid> UserID { get; set; }
         [DisplayName("萤石子账号ID")]
         public string YsAccount { get; set; }

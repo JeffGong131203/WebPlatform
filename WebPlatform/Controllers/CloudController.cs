@@ -49,6 +49,31 @@ namespace WebPlatform.Controllers
         }
         
         /// <summary>
+        /// 萤石回看
+        /// </summary>
+        /// <param name="sno"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult YSRec(string sno)
+        {
+            string recUrl = string.Format("ezopen://open.ys7.com/{0}/1.rec",sno);
+
+            YsAPI ys;
+            //string accountID = string.Empty;
+            string appKey = System.Configuration.ConfigurationManager.AppSettings["YsAppKey"].ToString();
+            string secret = System.Configuration.ConfigurationManager.AppSettings["YsSecret"].ToString();
+
+            //GetUserYSAccount(out accountID, out appKey, out secret);
+            ys = new YsAPI(appKey,secret);
+
+            ViewBag.token = ys.getAccessToken(false);
+            ViewBag.appKey = appKey;
+            ViewBag.url = recUrl;
+
+            return Redirect("~/CloudAPI");
+        }
+
+        /// <summary>
         /// 萤石子账号管理Get
         /// </summary>
         /// <returns></returns>
@@ -133,7 +158,7 @@ namespace WebPlatform.Controllers
                 ys = new YsAPI(appKey,secret);
             }
 
-            DataTable ysLiveList = ys.getLiveLists();
+            DataTable ysLiveList = ys.getDeviceLists(0,0);
 
             ViewBag.ysLiveList = ysLiveList;
 
@@ -285,7 +310,7 @@ namespace WebPlatform.Controllers
                 ys = new YsAPI(appKey, secret);
             }
 
-            DataTable ysLiveList = ys.getLiveLists();
+            DataTable ysLiveList = ys.getDeviceLists(0,0);
 
             ViewBag.ysLiveList = ysLiveList;
             ViewBag.splitNum = splitNum;

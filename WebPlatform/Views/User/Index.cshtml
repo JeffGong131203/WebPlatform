@@ -1,22 +1,22 @@
 ﻿@model IEnumerable<WebPlatform.Models.Portal_User>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "平台用户管理";
 }
 
-<h2>Index</h2>
+<h2>平台用户管理</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("创建", "Create")
 </p>
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Loginno)
         </th>
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => model.Loginpsw)
-        </th>
+        </th>*@
         <th>
             @Html.DisplayNameFor(model => model.IsUsed)
         </th>
@@ -28,16 +28,20 @@
         <td>
             @Html.DisplayFor(modelItem => item.Loginno)
         </td>
-        <td>
+        @*<td>
             @Html.DisplayFor(modelItem => item.Loginpsw)
-        </td>
+        </td>*@
         <td>
             @Html.DisplayFor(modelItem => item.IsUsed)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+            @Html.ActionLink("编辑", "Edit", new { id=item.ID }) |
+            @*@Html.ActionLink("Details", "Details", new { id=item.ID }) |*@
+            @Html.ActionLink("删除", "Delete", new { id = item.ID }) |
+            @Html.ActionLink("权限","Index","Portal_Auth_User",new { id = item.ID },null) |
+            @Html.ActionLink("客户", "Index", "Portal_User_Customer",new { id = item.ID },null) |
+            @Html.ActionLink("萤石", "Create", "Cloud_YS_User", new { id = item.ID }, null)
+            
         </td>
     </tr>
 }

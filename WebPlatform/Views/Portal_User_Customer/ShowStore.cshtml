@@ -1,0 +1,6 @@
+﻿@{
+    if (ViewBag.Store != null)
+    {
+        Html.DropDownList("store_dropdownlist", new SelectList(ViewBag.Store, "Id", "StoreName"));
+    }
+}

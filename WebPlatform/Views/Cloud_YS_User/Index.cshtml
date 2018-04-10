@@ -3,18 +3,23 @@
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
 }
 
-<h2>Index</h2>
+<h2>子账户分配</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("创建", "Create")
 </p>
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.UserID)
         </th>
+        <th>
+            帐号
+            </th>
         <th>
             @Html.DisplayNameFor(model => model.YsAccount)
         </th>
@@ -36,6 +41,9 @@
             @Html.DisplayFor(modelItem => item.UserID)
         </td>
         <td>
+            @db.Portal_User.Find(item.UserID).Loginno
+        </td>
+        <td>
             @Html.DisplayFor(modelItem => item.YsAccount)
         </td>
         <td>
@@ -48,9 +56,8 @@
             @Html.DisplayFor(modelItem => item.YsSecret)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+            @Html.ActionLink("编辑", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("删除", "Delete", new { id=item.ID })
         </td>
     </tr>
 }

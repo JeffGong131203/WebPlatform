@@ -4,7 +4,7 @@
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>用户-客户信息映射</h2>
 
 
 @using (Html.BeginForm()) 
@@ -12,13 +12,13 @@
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>Portal_User_Customer</h4>
+        @*<h4>Portal_User_Customer</h4>*@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
             @Html.LabelFor(model => model.UserID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.UserID, new { htmlAttributes = new { @class = "form-control" } })
+                <input class="form-control text-box single-line" id="UserID" name="UserID" readonly="true" type="text" value="@ViewBag.userID">
                 @Html.ValidationMessageFor(model => model.UserID, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -26,39 +26,78 @@
         <div class="form-group">
             @Html.LabelFor(model => model.CusID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.CusID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.CusID, new { htmlAttributes = new { @class = "form-control",@readonly="true" } })
                 @Html.ValidationMessageFor(model => model.CusID, "", new { @class = "text-danger" })
+                @Html.DropDownList("customer_dropdownlist", new SelectList(ViewBag.Customer, "Id", "CusName"))
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.AreaID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.AreaID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.AreaID, new { htmlAttributes = new { @class = "form-control",@readonly="true" } })
                 @Html.ValidationMessageFor(model => model.AreaID, "", new { @class = "text-danger" })
+                @Html.DropDownList("area_dropdownlist", new SelectList(ViewBag.Area, "Id", "AreaName"))
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.StoreID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.StoreID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.StoreID, new { htmlAttributes = new { @class = "form-control",@readonly="true" } })
                 @Html.ValidationMessageFor(model => model.StoreID, "", new { @class = "text-danger" })
+                @Html.DropDownList("store_dropdownlist", new SelectList(ViewBag.Store, "Id", "StoreName"))
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="创建" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("返回", "Index",new { id = ViewBag.userID})
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+@*<script type="text/javascript">
+    $(document).ready(init);
+
+    function init() {
+        $("select[name='customer_dropdownlist']").change(function () {
+            var selectedCus = $(this).val();
+            ShowArea(selectedCus);
+        });
+
+        $("select[name='area_dropdownlist']").change(function () {
+            var selectedArea = $(this).val();
+            ShowStore(selectedArea);
+        });
+    }
+
+    function ShowArea(cus) {
+        $.ajax({
+            url: "@Url.Action("ShowArea", "Portal_User_Customer")",
+            data: { cusID: cus },
+            success: function (data) {
+                $("#area").html(data);
+            }
+        });
+    }
+
+    function ShowStore(area) {
+        $.ajax({
+            url: "@Url.Action("ShowStore", "Portal_User_Customer")",
+            data: { areaID: area },
+            success: function (data) {
+                $("#store").html(data);
+            }
+        });
+    }
+ </script>*@

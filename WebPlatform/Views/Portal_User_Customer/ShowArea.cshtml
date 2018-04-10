@@ -1,0 +1,7 @@
+﻿@{ 
+    if (ViewBag.Area != null)
+    {
+        Html.DropDownList("area_dropdownlist", new SelectList(ViewBag.Area, "Id", "AreaName"));
+    }
+
+}

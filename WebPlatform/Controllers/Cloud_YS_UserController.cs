@@ -39,8 +39,10 @@ namespace WebPlatform.Controllers
 
         // GET: Cloud_YS_User/Create
         [Authorize(Roles = "admin")]
-        public ActionResult Create()
+        public ActionResult Create(Guid? id)
         {
+            ViewBag.userID = id;
+
             return View();
         }
 

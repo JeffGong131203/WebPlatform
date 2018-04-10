@@ -16,9 +16,11 @@ namespace WebPlatform.Controllers
 
         // GET: Portal_Auth_User
         [Authorize(Roles = "admin")]
-        public ActionResult Index()
+        public ActionResult Index(Guid? id)
         {
-            return View(db.Portal_Auth_User.ToList());
+            ViewBag.userID = id;
+
+            return View(db.Portal_Auth_User.Where(userAuth => userAuth.UserID == id).ToList());
         }
 
         // GET: Portal_Auth_User/Details/5
@@ -39,8 +41,18 @@ namespace WebPlatform.Controllers
 
         // GET: Portal_Auth_User/Create
         [Authorize(Roles = "admin")]
-        public ActionResult Create()
+        public ActionResult Create(Guid? userid)
         {
+            ViewBag.userID = userid;
+
+            var authList = db.Portal_Auth.ToList();
+            var selectList = new SelectList(authList, "ID", "AuthName");
+            var selectItemList = new List<SelectListItem>();
+
+            selectItemList.AddRange(selectList);
+
+            ViewBag.authList = selectItemList;
+
             return View();
         }
 
@@ -55,6 +67,10 @@ namespace WebPlatform.Controllers
             if (ModelState.IsValid)
             {
                 portal_Auth_User.ID = Guid.NewGuid();
+
+                //权限赋值
+                portal_Auth_User.AuthID = new Guid(Request.Form["authList"]);
+
                 db.Portal_Auth_User.Add(portal_Auth_User);
                 db.SaveChanges();
                 return RedirectToAction("Index");

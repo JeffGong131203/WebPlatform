@@ -6830,6 +6830,7 @@
     <Content Include="AdminLTE\dist\js\demo.js" />
     <Content Include="AdminLTE\dist\js\pages\dashboard.js" />
     <Content Include="AdminLTE\dist\js\pages\dashboard2.js" />
+    <Content Include="CloudAPI\YSRec.html" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
@@ -7524,6 +7525,10 @@
     <Content Include="Views\Cloud_YS_User\Details.cshtml" />
     <Content Include="Views\Cloud_YS_User\Edit.cshtml" />
     <Content Include="Views\Cloud_YS_User\Index.cshtml" />
+    <Content Include="Views\Portal_User_Customer\ShowArea.cshtml" />
+    <Content Include="Views\Portal_User_Customer\ShowStore.cshtml" />
+    <Content Include="Views\Shared\Manage.cshtml" />
+    <Content Include="Views\Cloud\YSRec.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

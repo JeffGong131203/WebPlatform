@@ -29,12 +29,12 @@
                                     <div class="inner">
                                         <h3>第 @(i+1) 屏</h3>
                                         <p>
-                                            <select name="SEL_@i" class="form-control select2" style="max-width:100px">
+                                            <select name="SEL_@i" class="form-control select2" style="width:200px">
                                                 @foreach (System.Data.DataRow dr in ysLiveList.Rows)
                                                 {
-                                                    if (@dr["exception"].ToString() == "0")
+                                                    if (@dr["status"].ToString() == "1")
                                                     {
-                                                        <option>@dr["deviceSerial"]</option>
+                                                        <option value="@dr["deviceSerial"]">@dr["deviceName"]</option>
                                                     }
                                                 }
                                             </select>

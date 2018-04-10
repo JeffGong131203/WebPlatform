@@ -8,13 +8,13 @@ namespace WebPlatform.Models
     {
         [DisplayName("ID")]
         public System.Guid ID { get; set; }
-        [DisplayName("用户")]
+        [DisplayName("用户ID")]
         public Nullable<System.Guid> UserID { get; set; }
-        [DisplayName("客户")]
+        [DisplayName("客户ID")]
         public Nullable<System.Guid> CusID { get; set; }
-        [DisplayName("大区")]
+        [DisplayName("大区ID")]
         public Nullable<System.Guid> AreaID { get; set; }
-        [DisplayName("门店")]
+        [DisplayName("门店ID")]
         public Nullable<System.Guid> StoreID { get; set; }
     }
 }

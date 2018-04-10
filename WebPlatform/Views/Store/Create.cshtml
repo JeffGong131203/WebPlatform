@@ -4,7 +4,7 @@
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>创建门店信息</h2>
 
 
 @using (Html.BeginForm()) 
@@ -18,8 +18,11 @@
         <div class="form-group">
             @Html.LabelFor(model => model.AreaID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.AreaID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.AreaID, new { htmlAttributes = new { @class = "form-control",@readonly="true" } })
                 @Html.ValidationMessageFor(model => model.AreaID, "", new { @class = "text-danger" })
+                @Html.DropDownList("areaList", ViewBag.areaList as IEnumerable<SelectListItem>)
+
+
             </div>
         </div>
 
@@ -41,14 +44,14 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="创建" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("返回", "Index")
 </div>
 
 @section Scripts {

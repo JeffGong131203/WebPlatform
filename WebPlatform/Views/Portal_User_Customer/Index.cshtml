@@ -2,12 +2,14 @@
 
 @{
     ViewBag.Title = "Index";
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
 }
 
-<h2>Index</h2>
+<h2>客户帐号分配</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("创建", "Create", new { id = ViewBag.userID})
 </p>
 <table class="table">
     <tr>
@@ -15,37 +17,61 @@
             @Html.DisplayNameFor(model => model.UserID)
         </th>
         <th>
+            用户帐号
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.CusID)
+        </th>
+        <th>
+            客户名称
         </th>
         <th>
             @Html.DisplayNameFor(model => model.AreaID)
         </th>
         <th>
+            大区名称
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.StoreID)
+        </th>
+        <th>
+            门店名称
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.UserID)
+    @foreach (var item in Model)
+    {
+        <tr>
+         <td>
+                @Html.DisplayFor(modelItem => item.UserID)
+            </td>
+         <td>
+                @db.Portal_User.Find(item.UserID).Loginno
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.CusID)
         </td>
+            <td>
+                @db.Portal_Customer.Find(item.CusID).CusName
+            </td>
         <td>
             @Html.DisplayFor(modelItem => item.AreaID)
         </td>
+            <td>
+                @db.Portal_Customer_Area.Find(item.AreaID).AreaName
+            </td>
         <td>
             @Html.DisplayFor(modelItem => item.StoreID)
         </td>
+            <td>
+                @db.Portal_Customer_Store.Find(item.StoreID).StoreName
+            </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+            @Html.ActionLink("编辑", "Edit", new { id = item.ID }) |
+            @Html.ActionLink("删除", "Delete", new { id = item.ID })
         </td>
     </tr>
-}
+    }
 
 </table>
