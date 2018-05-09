@@ -1,0 +1,59 @@
+﻿@model WebPlatform.Models.Device_Info
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Device_Info</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DevCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DevCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DevName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DevName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ParentID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ParentID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DevType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DevType)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PropertyJson)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PropertyJson)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

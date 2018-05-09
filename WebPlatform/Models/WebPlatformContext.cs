@@ -26,6 +26,7 @@ namespace WebPlatform.Models
         public DbSet<Portal_Menu> Portal_Menu { get; set; }
         public DbSet<Portal_User> Portal_User { get; set; }
         public DbSet<Portal_User_Customer> Portal_User_Customer { get; set; }
+        public DbSet<Device_Info> Device_Info { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -39,6 +40,7 @@ namespace WebPlatform.Models
             modelBuilder.Configurations.Add(new Portal_MenuMap());
             modelBuilder.Configurations.Add(new Portal_UserMap());
             modelBuilder.Configurations.Add(new Portal_User_CustomerMap());
+            modelBuilder.Configurations.Add(new Device_InfoMap());
         }
     }
 }
