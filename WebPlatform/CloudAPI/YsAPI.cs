@@ -300,6 +300,10 @@ namespace WebPlatform.CloudAPI
                         jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
                         DataTable dt = new DataTable();
 
+                        total = int.Parse(jStr["page"]["total"].ToString());
+                        page = int.Parse(jStr["page"]["page"].ToString());
+                        size = int.Parse(jStr["page"]["size"].ToString());
+
                         var retData = jStr["data"];
 
                         if (retData != null)
@@ -354,6 +358,149 @@ namespace WebPlatform.CloudAPI
 
             return dtList;
         }
+
+        /// <summary>
+        /// 主帐号添加设备
+        /// </summary>
+        /// <param name="deviceSerial"></param>
+        /// <param name="validateCode"></param>
+        /// <returns></returns>
+        public string AddDevice(string deviceSerial,string validateCode)
+        {
+            string ret = string.Empty;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/device/add";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("deviceSerial", deviceSerial);
+                parameters.Add("validateCode", validateCode);
+
+                string retStr = string.Empty;
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                ret = jStr.ToString();
+
+                if (jStr["code"].ToString() == "200")
+                {
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// 批量开通直播
+        /// </summary>
+        /// <param name="LiveSrc"></param>
+        /// <returns></returns>
+        public string SetLive(string LiveSrc)
+        {
+            string ret = string.Empty;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/live/video/open";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("source", LiveSrc);
+
+                string retStr = string.Empty;
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                ret = jStr.ToString();
+
+                if (jStr["code"].ToString() == "200")
+                {
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return ret;
+        }
+
+        public string SetDeviceName(string deviceSerial, string deviceName)
+        {
+            string ret = string.Empty;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/device/name/update";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("deviceSerial", deviceSerial);
+                parameters.Add("deviceName", deviceName);
+
+                string retStr = string.Empty;
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                ret = jStr.ToString();
+
+                if (jStr["code"].ToString() == "200")
+                {
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// 批量添加好友
+        /// </summary>
+        /// <param name="LiveSrc"></param>
+        /// <returns></returns>
+        public string AddFriend(string phone)
+        {
+            string ret = string.Empty;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/friend/add";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("phone", phone);
+
+                string retStr = string.Empty;
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                ret = jStr.ToString();
+
+                if (jStr["code"].ToString() == "200")
+                {
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return ret;
+        }
+
 
     }
 }

@@ -18,5 +18,10 @@ namespace WebPlatform.Controllers
 
             return Content(JsonConvert.SerializeObject(ys.getLiveLists(), Formatting.Indented));
         }
+
+        public ActionResult COMTest()
+        {
+            return View();
+        }
     }
 }

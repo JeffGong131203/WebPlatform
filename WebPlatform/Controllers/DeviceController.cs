@@ -48,15 +48,15 @@ namespace WebPlatform.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,DevCode,DevName,ParentID,DevType,PropertyJson")] Device_Info device_Info)
         {
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 device_Info.ID = Guid.NewGuid();
                 db.Device_Info.Add(device_Info);
                 db.SaveChanges();
                 return RedirectToAction("Index");
-            }
+            //}
 
-            return View(device_Info);
+            //return View(device_Info);
         }
 
         // GET: Device/Edit/5

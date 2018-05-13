@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -316,6 +317,61 @@ namespace WebPlatform.Controllers
             ViewBag.splitNum = splitNum;
 
             return View();
+        }
+
+        /// <summary>
+        /// 萤石批量管理
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "admin")]
+        public ActionResult YSManage()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 批量添加设备
+        /// </summary>
+        /// <param name="devList"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public ActionResult AddDevice()
+        {
+            string ret = string.Empty;
+
+            string devList = Request["SendData"];
+
+            if (!string.IsNullOrEmpty(devList))
+            {
+                YsAPI ys;
+                //string accountID = string.Empty;
+                string appKey = System.Configuration.ConfigurationManager.AppSettings["YsAppKey"].ToString();
+                string secret = System.Configuration.ConfigurationManager.AppSettings["YsSecret"].ToString();
+
+                //GetUserYSAccount(out accountID, out appKey, out secret);
+                ys = new YsAPI(appKey, secret);
+
+                //string token = ys.getAccessToken(false);
+
+                JArray dev = Newtonsoft.Json.Linq.JArray.Parse(devList);
+
+                for (int i = 0; i < dev.Count(); i++)
+                {
+                    ret += ys.AddDevice(dev[i]["deviceSerial"].ToString(), dev[i]["validateCode"].ToString());
+                    ret += "\r\n";
+
+                    ret += ys.SetDeviceName(dev[i]["deviceSerial"].ToString(), dev[i]["deviceName"].ToString());
+                    ret += "\r\n";
+
+                    ret += ys.SetLive(dev[i]["deviceSerial"].ToString() + ":1");
+                    ret += "\r\n";
+                }
+            }
+
+            ViewBag.retMsg = ret;
+
+            return View("YSManage");
         }
     }
 }

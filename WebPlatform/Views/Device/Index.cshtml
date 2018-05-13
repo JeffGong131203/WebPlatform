@@ -1,14 +1,16 @@
 ﻿@model IEnumerable<WebPlatform.Models.Device_Info>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "设备管理";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
 }
 
-<h2>Index</h2>
+<h2>设备管理</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("新建", "Create")
 </p>
 <table class="table">
     <tr>
@@ -30,29 +32,33 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.DevCode)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DevName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ParentID)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DevType)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PropertyJson)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DevCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DevName)
+            </td>
+            <td>
+                @*@Html.DisplayFor(modelItem => item.ParentID)*@
+                @if (item.ParentID != Guid.Empty)
+                {
+                    @db.Device_Info.Find(item.ParentID).DevName
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DevType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PropertyJson)
+            </td>
+            <td>
+                @Html.ActionLink("编辑", "Edit", new { id = item.ID }) |
+                @Html.ActionLink("删除", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
 
 </table>

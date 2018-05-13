@@ -214,10 +214,12 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Cloud_YS_User.cs" />
     <Compile Include="Models\Device_Info.cs" />
+    <Compile Include="Models\Device_User.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Mapping\Cloud_YS_UserMap.cs" />
     <Compile Include="Models\Mapping\Device_InfoMap.cs" />
+    <Compile Include="Models\Mapping\Device_UserMap.cs" />
     <Compile Include="Models\Mapping\Portal_AuthMap.cs" />
     <Compile Include="Models\Mapping\Portal_Auth_MenuMap.cs" />
     <Compile Include="Models\Mapping\Portal_Auth_UserMap.cs" />
@@ -7538,6 +7540,7 @@
     <Content Include="Views\Device\Details.cshtml" />
     <Content Include="Views\Device\Edit.cshtml" />
     <Content Include="Views\Device\Index.cshtml" />
+    <Content Include="Views\Cloud\YSManage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -7563,6 +7566,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

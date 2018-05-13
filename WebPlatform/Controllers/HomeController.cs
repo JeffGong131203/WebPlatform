@@ -37,10 +37,25 @@ namespace WebPlatform.Controllers
 
             DataTable ysLiveList = ys.getDeviceLists(0, 0);
 
-            ViewBag.devCount = ysLiveList.Rows.Count;
-            ViewBag.onCount = ysLiveList.Select("status='1'").Count();
-            ViewBag.offCount = ysLiveList.Select("status='0'").Count();
-            ViewBag.errCount = 0;
+            int devCount, onCount, offCount, errCount;
+            devCount = onCount = offCount = errCount = 0;
+
+            //YS设备
+            devCount = ysLiveList.Rows.Count;
+            if (devCount > 0)
+            {
+                onCount = ysLiveList.Select("status='1'").Count();
+                offCount = ysLiveList.Select("status='0'").Count();
+            }
+
+            //本地设备
+            Guid userid = this.GetUserID();
+            IEnumerable<Device_User> devList = db.Device_User.Where(dev_u => dev_u.UserID == userid).ToList();
+
+            ViewBag.devCount = devCount + devList.Count();
+            ViewBag.onCount = onCount;
+            ViewBag.offCount = offCount;
+            ViewBag.errCount = errCount;
 
             return View();
         }
@@ -107,7 +122,7 @@ namespace WebPlatform.Controllers
                     string role = string.Empty;
 
                     var authList = db.Portal_Auth.Join(db.Portal_Auth_User, a => a.ID, u => u.AuthID, (a, u) => new { a.AuthCode, a.AuthName, u.UserID }).Where(user => user.UserID == portal_User.ID).ToList();
-                    for(int i=0;i<authList.Count();i++)
+                    for (int i = 0; i < authList.Count(); i++)
                     {
                         if (i == 0)
                         {
@@ -118,8 +133,8 @@ namespace WebPlatform.Controllers
                             role += "," + authList[i].AuthName;
                         }
                     }
-         
-                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1,portal_User.Loginno,DateTime.Now,DateTime.Now.AddMinutes(800),true,role);
+
+                    FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, portal_User.Loginno, DateTime.Now, DateTime.Now.AddMinutes(800), true, role);
                     string encryptedTicket = FormsAuthentication.Encrypt(authTicket);
                     //FormsAuthentication.SetAuthCookie()
                     System.Web.HttpCookie authCookie = new System.Web.HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
@@ -127,7 +142,7 @@ namespace WebPlatform.Controllers
 
                     HttpCookie _cookie = new HttpCookie("User");
 
-                    _cookie.Values.Add("UserID",HttpUtility.UrlEncode(portal_User.ID.ToString()));
+                    _cookie.Values.Add("UserID", HttpUtility.UrlEncode(portal_User.ID.ToString()));
                     _cookie.Values.Add("Loginno", HttpUtility.UrlEncode(portal_User.Loginno));
                     Response.Cookies.Add(_cookie);
 

@@ -17,7 +17,7 @@ namespace WebPlatform.Models
         [DisplayName("上级设备ID")]
         public Guid ParentID { get; set; }
         [DisplayName("设备类型")]
-        public int DevType { get; set; }
+        public string DevType { get; set; }
         [DisplayName("设备属性")]
         public string PropertyJson { get; set; }
     }

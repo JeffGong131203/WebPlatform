@@ -7,6 +7,7 @@ using System.Web.Services;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace SerialPortSvc
 {
@@ -20,13 +21,16 @@ namespace SerialPortSvc
     // [System.Web.Script.Services.ScriptService]
     public class SerialPortData : System.Web.Services.WebService
     {
-        private static SerialPort sp = null;
-        private static string reciveData = string.Empty;
+        private static SerialPort sp = new SerialPort();
+        private static string _reciveData = string.Empty;
+        private static string _sendData = string.Empty;
+        private static string _deviceID = string.Empty;
+        private static DateTime _sendTime;
 
         [WebMethod]
-        public string HelloWorld()
+        public bool PortStatus()
         {
-            return "Hello World";
+            return sp.IsOpen;
         }
 
         [WebMethod]
@@ -49,7 +53,7 @@ namespace SerialPortSvc
                     //System.Environment.Exit(0); //彻底退出应用程序   
                 }
 
-                sp = new SerialPort();
+                //sp = new SerialPort();
                 sp.PortName = targetCOMPort;
 
                 sp.BaudRate = Int32.Parse(System.Configuration.ConfigurationManager.AppSettings["BaudRate"].ToString()); //串行波特率
@@ -77,50 +81,76 @@ namespace SerialPortSvc
                     if (!sp.IsOpen)
                     {
                         sp.Open(); //打开串口
+
+                        return true;
+
                     }
                 }
                 catch (Exception ex)
                 {
                     throw new Exception("串行端口打开失败！具体原因：" + ex.Message);
                     //System.Environment.Exit(0); //彻底退出应用程序   
+
                 }
+
+                return false;
             }
 
 
-            return true; 
         }
 
         [WebMethod]
         public bool ClosePort()
         {
-            sp.Close();
+            try
+            {
+                sp.Close();
 
-            return true;
+                return true;
+
+            }
+            catch
+            {
+                return false;
+            }
+
         }
 
         [WebMethod]
-        public string SendData(string data)
+        public bool SendData(string data,string deviceID)
         {
-            byte[] hexSendData = HexStringToByteArray(data);
-
-            if (sp != null)
+            try
             {
-                sp.Write(hexSendData, 0, hexSendData.Length);
+                byte[] hexSendData = HexStringToByteArray(data);
+
+                if (sp != null)
+                {
+                    _reciveData = string.Empty;
+                    sp.Write(hexSendData, 0, hexSendData.Length);
+                    _sendData = data;
+                    _deviceID = deviceID;
+                    _sendTime = DateTime.Now;
+
+                    return true;
+                }
+                else
+                {
+                    throw new Exception("当前设备串行端口未打开！");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("当前设备串行端口未打开！");
+                throw ex;
             }
 
-            Thread.Sleep(3000);
+            //Thread.Sleep(3000);
 
-            return reciveData;
         }
 
         [WebMethod]
         public string GetReciveData()
         {
-            return reciveData;
+            return _reciveData;
         }
 
         /// <summary>
@@ -133,11 +163,22 @@ namespace SerialPortSvc
             try
             {
                 //Comm.BytesToRead中为要读入的字节长度
-                int len = sp.BytesToRead;
-                Byte[] readBuffer = new Byte[len];
-                sp.Read(readBuffer, 0, len); //将数据读入缓存
+                int byteNumber = sp.BytesToRead;
+                Thread.Sleep(20);
+
+                //延时等待数据接收完毕。
+                while ((byteNumber < sp.BytesToRead) && (sp.BytesToRead < 4800))
+                {
+                    byteNumber = sp.BytesToRead;
+                    Thread.Sleep(20);
+                }
+
+                int n = sp.BytesToRead; //记录下缓冲区的字节个数 
+                byte[] buf = new byte[n]; //声明一个临时数组存储当前来的串口数据 
+                sp.Read(buf, 0, n); //读取缓冲数据到buf中，同时将这串数据从缓冲区移除 
+
                 //处理readBuffer中的数据，自定义处理过程
-                string msg = Encoding.Default.GetString(readBuffer, 0, len); //获取出入库产品编号
+                string msg = ByteArrayToHexString(buf);  //获取出入库产品编号
 
                 ProcessData(msg);
             }
@@ -149,27 +190,41 @@ namespace SerialPortSvc
 
         private void ProcessData(string strData)
         {
-            reciveData = string.Empty;
+            _reciveData = string.Empty;
 
-            reciveData = strData;
+            Dictionary<string, string> retData = new Dictionary<string, string>();
+            retData.Add("DeviceID", _deviceID);
+            retData.Add("SendTime", _sendTime.ToString());
+            retData.Add("SendData", _sendData);
+            retData.Add("ReciveTime", DateTime.Now.ToString());
+            retData.Add("ReciveData", strData);
+
+            _reciveData = JsonConvert.SerializeObject(retData, Formatting.Indented); 
         }
 
         private static byte[] HexStringToByteArray(string s)
         {
-            if (s.Length == 0)
+            try
             {
-                throw new Exception("将16进制字符串转换成字节数组时出错，错误信息：被转换的字符串长度为0。");
+                if (s.Length == 0)
+                {
+                    throw new Exception("将16进制字符串转换成字节数组时出错，错误信息：被转换的字符串长度为0。");
+                }
+
+                s = s.Replace(" ", "");
+                byte[] buffer = new byte[s.Length / 2];
+
+                for (int i = 0; i < s.Length; i += 2)
+                {
+                    buffer[i / 2] = Convert.ToByte(s.Substring(i, 2), 16);
+                }
+
+                return buffer;
             }
-
-            s = s.Replace(" ", "");
-            byte[] buffer = new byte[s.Length / 2];
-
-            for (int i = 0; i < s.Length; i += 2)
+            catch (Exception ex)
             {
-                buffer[i / 2] = Convert.ToByte(s.Substring(i, 2), 16);
+                throw new Exception("将16进制字符串转换成字节数组时出错！具体原因：" + ex.Message);
             }
-
-            return buffer;
         }
 
         private static string ByteArrayToHexString(byte[] ReceivedData)

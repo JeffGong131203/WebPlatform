@@ -11,6 +11,7 @@ namespace WebPlatform.Models.Mapping
 
             this.Property(t => t.DevCode).HasMaxLength(50);
             this.Property(t => t.DevName).HasMaxLength(50);
+            this.Property(t => t.DevType).HasMaxLength(50);
             this.Property(t => t.PropertyJson).HasMaxLength(4000);
 
             this.ToTable("Device_Info");
