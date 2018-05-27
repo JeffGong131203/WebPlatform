@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -34,7 +36,7 @@ namespace WebPlatform.Controllers
             return new Guid(userid);
         }
 
-        private void GetUserYSAccount(out string accountID,out string appKey,out string secret)
+        private void GetUserYSAccount(out string accountID, out string appKey, out string secret)
         {
             accountID = appKey = secret = string.Empty;
 
@@ -48,7 +50,7 @@ namespace WebPlatform.Controllers
                 accountID = ysUserList.ToList()[0].YsAccount;
             }
         }
-        
+
         /// <summary>
         /// 萤石回看
         /// </summary>
@@ -57,7 +59,7 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult YSRec(string sno)
         {
-            string recUrl = string.Format("ezopen://open.ys7.com/{0}/1.rec",sno);
+            string recUrl = string.Format("ezopen://open.ys7.com/{0}/1.rec", sno);
 
             YsAPI ys;
             //string accountID = string.Empty;
@@ -65,7 +67,7 @@ namespace WebPlatform.Controllers
             string secret = System.Configuration.ConfigurationManager.AppSettings["YsSecret"].ToString();
 
             //GetUserYSAccount(out accountID, out appKey, out secret);
-            ys = new YsAPI(appKey,secret);
+            ys = new YsAPI(appKey, secret);
 
             ViewBag.token = ys.getAccessToken(false);
             ViewBag.appKey = appKey;
@@ -79,7 +81,7 @@ namespace WebPlatform.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize(Roles = "admin")]
-        public ActionResult YSAccountManage(int pageStart = 0,int pageSize=10)
+        public ActionResult YSAccountManage(int pageStart = 0, int pageSize = 10)
         {
             YsAPI ys;
             string accountID = string.Empty;
@@ -118,8 +120,8 @@ namespace WebPlatform.Controllers
 
             string retMsg = string.Empty;
 
-            accountID = ys.addSubAccount(accountName,accountPsw);
-            if(!string.IsNullOrEmpty(accountID))
+            accountID = ys.addSubAccount(accountName, accountPsw);
+            if (!string.IsNullOrEmpty(accountID))
             {
                 retMsg = ys.SetSubAccountPolicy(accountID, new string[] { }, devlist);
             }
@@ -156,10 +158,10 @@ namespace WebPlatform.Controllers
             }
             else
             {
-                ys = new YsAPI(appKey,secret);
+                ys = new YsAPI(appKey, secret);
             }
 
-            DataTable ysLiveList = ys.getDeviceLists(0,0);
+            DataTable ysLiveList = ys.getDeviceLists(0, 0);
 
             ViewBag.ysLiveList = ysLiveList;
 
@@ -217,6 +219,112 @@ namespace WebPlatform.Controllers
         /// 多设备直播显示
         /// </summary>
         /// <returns></returns>
+        [Authorize]
+        public ActionResult YSLiveVideoMulti(string ysm)
+        {
+            YsAPI ys;
+
+            string accountID = string.Empty;
+            string appKey = string.Empty;
+            string secret = string.Empty;
+
+            GetUserYSAccount(out accountID, out appKey, out secret);
+
+            //为空则是子账号
+            if (string.IsNullOrEmpty(appKey) && string.IsNullOrEmpty(secret))
+            {
+                ys = new YsAPI(accountID);
+            }
+            else
+            {
+                ys = new YsAPI(appKey, secret);
+            }
+
+            int splitNum = 0;
+
+            DataTable ysLiveList = ys.getLiveLists();
+            Dictionary<int, string[]> liveAddressList = new Dictionary<int, string[]>();
+
+            Dictionary<int, string> serialNos = new Dictionary<int, string>();
+
+            //Guid userid = GetUserID();
+            //IEnumerable<YSMultiSet> ysMultiSetList = db.YSMultiSet.Where(ysm => ysm.UserID == userid).ToList();
+
+            //for (int i = 0; i < Request.Form.AllKeys.Count(); i++)
+            //{
+            //    string key = Request.Form.AllKeys[i];
+            //    if (key == "splitNum")
+            //    {
+            //        splitNum = int.Parse(Request.Form[key]);
+            //    }
+            //    else
+            //    {
+            //        if (key.Contains("SEL_"))
+            //        {
+            //            int snoInd = int.Parse(key.Split("_".ToArray())[1]);
+
+            //            string sno = Request.Form[key];
+
+            //            serialNos.Add(snoInd, sno);
+            //        }
+            //    }
+            //}
+
+            ////Edit
+            //if (serialNos.Count > 0 && ysMultiSetList.Count() > 0)
+            //{
+            //    YSMultiSet ysm = ysMultiSetList.ToList()[0];
+            //    ysm.YSMultiSetJson = JsonConvert.SerializeObject(serialNos, Formatting.Indented);
+
+            //    db.Entry(ysm).State = EntityState.Modified;
+            //    db.SaveChanges();
+            //}
+
+            ////Create
+            //if (serialNos.Count > 0 && ysMultiSetList.Count() == 0)
+            //{
+            //    YSMultiSet ysm = new YSMultiSet();
+            //    ysm.ID = Guid.NewGuid();
+            //    ysm.UserID = GetUserID();
+            //    ysm.YSMultiSetJson = JsonConvert.SerializeObject(serialNos, Formatting.Indented);
+
+            //    db.YSMultiSet.Add(ysm);
+            //    db.SaveChanges();
+            //}
+
+            ////Load Set
+            //if (serialNos.Count == 0 && ysMultiSetList.Count() > 0)
+            //{
+            //    serialNos = JsonConvert.DeserializeObject<Dictionary<int, string>>(ysMultiSetList.ToList()[0].YSMultiSetJson);
+            //}
+
+            serialNos = JsonConvert.DeserializeObject<Dictionary<int, string>>(ysm);
+
+            foreach (DataRow dr in ysLiveList.Rows)
+            {
+                foreach (KeyValuePair<int, string> sno in serialNos)
+                {
+                    if (sno.Value == dr["deviceSerial"].ToString() && dr["status"].ToString() == "1")
+                    {
+                        if (!liveAddressList.ContainsKey(sno.Key))
+                        {
+                            liveAddressList.Add(sno.Key, new string[2] { dr["hdAddress"].ToString(), dr["rtmpHd"].ToString() });
+                        }
+                    }
+                }
+            }
+
+            ViewBag.liveAddressList = liveAddressList;
+            ViewBag.splitNum = splitNum;
+
+            return View();
+
+        }
+
+        /// <summary>
+        /// 多设备直播显示
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Authorize]
         public ActionResult YSLiveVideoMulti()
@@ -246,16 +354,19 @@ namespace WebPlatform.Controllers
 
             Dictionary<int, string> serialNos = new Dictionary<int, string>();
 
+            Guid userid = GetUserID();
+            IEnumerable<YSMultiSet> ysMultiSetList = db.YSMultiSet.Where(ysm => ysm.UserID == userid).ToList();
+
             for (int i = 0; i < Request.Form.AllKeys.Count(); i++)
             {
                 string key = Request.Form.AllKeys[i];
-                if ( key== "splitNum")
+                if (key == "splitNum")
                 {
                     splitNum = int.Parse(Request.Form[key]);
                 }
                 else
                 {
-                    if(key.Contains("SEL_"))
+                    if (key.Contains("SEL_"))
                     {
                         int snoInd = int.Parse(key.Split("_".ToArray())[1]);
 
@@ -266,13 +377,44 @@ namespace WebPlatform.Controllers
                 }
             }
 
+            //Edit
+            if (serialNos.Count > 0 && ysMultiSetList.Count() > 0)
+            {
+                YSMultiSet ysm = ysMultiSetList.ToList()[0];
+                ysm.YSMultiSetJson = JsonConvert.SerializeObject(serialNos, Formatting.Indented);
+
+                db.Entry(ysm).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            //Create
+            if(serialNos.Count > 0 && ysMultiSetList.Count() == 0)
+            {
+                YSMultiSet ysm = new YSMultiSet();
+                ysm.ID = Guid.NewGuid();
+                ysm.UserID = GetUserID();
+                ysm.YSMultiSetJson = JsonConvert.SerializeObject(serialNos, Formatting.Indented);
+
+                db.YSMultiSet.Add(ysm);
+                db.SaveChanges();
+            }
+
+            //Load Set
+            if(serialNos.Count == 0 && ysMultiSetList.Count() > 0)
+            {
+                serialNos = JsonConvert.DeserializeObject<Dictionary<int, string>>(ysMultiSetList.ToList()[0].YSMultiSetJson);
+            }
+
             foreach (DataRow dr in ysLiveList.Rows)
             {
                 foreach (KeyValuePair<int, string> sno in serialNos)
                 {
-                    if (sno.Value == dr["deviceSerial"].ToString())
+                    if (sno.Value == dr["deviceSerial"].ToString() && dr["status"].ToString() == "1")
                     {
-                        liveAddressList.Add(sno.Key, new string[2] { dr["hdAddress"].ToString(), dr["rtmpHd"].ToString() });
+                        if (!liveAddressList.ContainsKey(sno.Key))
+                        {
+                            liveAddressList.Add(sno.Key, new string[2] { dr["hdAddress"].ToString(), dr["rtmpHd"].ToString() });
+                        }
                     }
                 }
             }
@@ -291,8 +433,16 @@ namespace WebPlatform.Controllers
         /// <param name="splitNum"></param>
         /// <returns></returns>
         [Authorize]
-        public ActionResult YSLiveVideoMultiSet(int splitNum)
+        public ActionResult YSLiveVideoMultiSet(int splitNum, bool reSet)
         {
+            Guid userid = GetUserID();
+            IEnumerable<YSMultiSet> ysMultiSetList = db.YSMultiSet.Where(ysm => ysm.UserID == userid).ToList();
+
+            if (!reSet && ysMultiSetList.Count()>0)
+            {
+                return RedirectToAction("YSLiveVideoMulti");
+            }
+
             YsAPI ys;
 
             string accountID = string.Empty;
@@ -311,7 +461,7 @@ namespace WebPlatform.Controllers
                 ys = new YsAPI(appKey, secret);
             }
 
-            DataTable ysLiveList = ys.getDeviceLists(0,0);
+            DataTable ysLiveList = ys.getDeviceLists(0, 0);
 
             ViewBag.ysLiveList = ysLiveList;
             ViewBag.splitNum = splitNum;
@@ -366,6 +516,9 @@ namespace WebPlatform.Controllers
 
                     ret += ys.SetLive(dev[i]["deviceSerial"].ToString() + ":1");
                     ret += "\r\n";
+
+                    //ret += ys.addSubAccount()
+
                 }
             }
 

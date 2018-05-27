@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="PortStatus">
+        <s:complexType />
+      </s:element>
+      <s:element name="PortStatusResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="PortStatusResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="OpenPort">
+        <s:complexType />
+      </s:element>
+      <s:element name="OpenPortResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="OpenPortResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ClosePort">
+        <s:complexType />
+      </s:element>
+      <s:element name="ClosePortResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="ClosePortResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendData">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="data" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="deviceID" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SendDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="SendDataResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetReciveData">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetReciveDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetReciveDataResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="PortStatusSoapIn">
+    <wsdl:part name="parameters" element="tns:PortStatus" />
+  </wsdl:message>
+  <wsdl:message name="PortStatusSoapOut">
+    <wsdl:part name="parameters" element="tns:PortStatusResponse" />
+  </wsdl:message>
+  <wsdl:message name="OpenPortSoapIn">
+    <wsdl:part name="parameters" element="tns:OpenPort" />
+  </wsdl:message>
+  <wsdl:message name="OpenPortSoapOut">
+    <wsdl:part name="parameters" element="tns:OpenPortResponse" />
+  </wsdl:message>
+  <wsdl:message name="ClosePortSoapIn">
+    <wsdl:part name="parameters" element="tns:ClosePort" />
+  </wsdl:message>
+  <wsdl:message name="ClosePortSoapOut">
+    <wsdl:part name="parameters" element="tns:ClosePortResponse" />
+  </wsdl:message>
+  <wsdl:message name="SendDataSoapIn">
+    <wsdl:part name="parameters" element="tns:SendData" />
+  </wsdl:message>
+  <wsdl:message name="SendDataSoapOut">
+    <wsdl:part name="parameters" element="tns:SendDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetReciveDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetReciveData" />
+  </wsdl:message>
+  <wsdl:message name="GetReciveDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetReciveDataResponse" />
+  </wsdl:message>
+  <wsdl:portType name="SerialPortDataSoap">
+    <wsdl:operation name="PortStatus">
+      <wsdl:input message="tns:PortStatusSoapIn" />
+      <wsdl:output message="tns:PortStatusSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="OpenPort">
+      <wsdl:input message="tns:OpenPortSoapIn" />
+      <wsdl:output message="tns:OpenPortSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ClosePort">
+      <wsdl:input message="tns:ClosePortSoapIn" />
+      <wsdl:output message="tns:ClosePortSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SendData">
+      <wsdl:input message="tns:SendDataSoapIn" />
+      <wsdl:output message="tns:SendDataSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetReciveData">
+      <wsdl:input message="tns:GetReciveDataSoapIn" />
+      <wsdl:output message="tns:GetReciveDataSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SerialPortDataSoap" type="tns:SerialPortDataSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PortStatus">
+      <soap:operation soapAction="http://tempuri.org/PortStatus" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpenPort">
+      <soap:operation soapAction="http://tempuri.org/OpenPort" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ClosePort">
+      <soap:operation soapAction="http://tempuri.org/ClosePort" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendData">
+      <soap:operation soapAction="http://tempuri.org/SendData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetReciveData">
+      <soap:operation soapAction="http://tempuri.org/GetReciveData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="SerialPortDataSoap12" type="tns:SerialPortDataSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="PortStatus">
+      <soap12:operation soapAction="http://tempuri.org/PortStatus" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpenPort">
+      <soap12:operation soapAction="http://tempuri.org/OpenPort" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ClosePort">
+      <soap12:operation soapAction="http://tempuri.org/ClosePort" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendData">
+      <soap12:operation soapAction="http://tempuri.org/SendData" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetReciveData">
+      <soap12:operation soapAction="http://tempuri.org/GetReciveData" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SerialPortData">
+    <wsdl:port name="SerialPortDataSoap" binding="tns:SerialPortDataSoap">
+      <soap:address location="http://180.168.67.158:8001/WebCom6/SerialPort.asmx" />
+    </wsdl:port>
+    <wsdl:port name="SerialPortDataSoap12" binding="tns:SerialPortDataSoap12">
+      <soap12:address location="http://180.168.67.158:8001/WebCom6/SerialPort.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

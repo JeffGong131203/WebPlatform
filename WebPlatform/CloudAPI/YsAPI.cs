@@ -334,6 +334,10 @@ namespace WebPlatform.CloudAPI
         {
             DataTable dtList = new DataTable();
 
+            int total = 0;
+            int page = 0;
+            int size = 0;
+
             string accessToken = getAccessToken(true);
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -342,6 +346,9 @@ namespace WebPlatform.CloudAPI
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 parameters.Add("accessToken", accessToken);
 
+                parameters.Add("pageStart", 0.ToString());
+                parameters.Add("pageSize", 10.ToString());
+
                 string retStr = string.Empty;
 
                 JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
@@ -349,6 +356,34 @@ namespace WebPlatform.CloudAPI
                 if (jStr["code"].ToString() == "200")
                 {
                     dtList = JsonConvert.DeserializeObject<DataTable>(jStr["data"].ToString());
+
+                    total = int.Parse(jStr["page"]["total"].ToString());
+                    page = int.Parse(jStr["page"]["page"].ToString());
+                    size = int.Parse(jStr["page"]["size"].ToString());
+
+                    while (total > (page + 1) * size)
+                    {
+                        parameters["pageStart"] = (page + 1).ToString();
+
+                        jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+                        DataTable dt = new DataTable();
+
+                        total = int.Parse(jStr["page"]["total"].ToString());
+                        page = int.Parse(jStr["page"]["page"].ToString());
+                        size = int.Parse(jStr["page"]["size"].ToString());
+
+                        var retData = jStr["data"];
+
+                        if (retData != null)
+                        {
+                            dt = JsonConvert.DeserializeObject<DataTable>(jStr["data"].ToString());
+                            dtList.Merge(dt);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
                 else //API Error,Write Log
                 {
@@ -365,7 +400,7 @@ namespace WebPlatform.CloudAPI
         /// <param name="deviceSerial"></param>
         /// <param name="validateCode"></param>
         /// <returns></returns>
-        public string AddDevice(string deviceSerial,string validateCode)
+        public string AddDevice(string deviceSerial, string validateCode)
         {
             string ret = string.Empty;
 

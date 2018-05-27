@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     int splitNum = ViewBag.splitNum;
-    Dictionary<int,string[]> liveLists = ViewBag.liveAddressList;
+    Dictionary<int, string[]> liveLists = ViewBag.liveAddressList;
 }
 
 <style>
@@ -21,25 +21,27 @@
 <script src="https://open.ys7.com/sdk/js/1.3/ezuikit.js"></script>
 <div class="row">
     <div class="col-sm-1">
-        <a href="@Url.Action("YSLive","Cloud")"><button type="button" class="btn btn-block btn-info">返回</button></a>
+        <a href="@Url.Action("YSLiveVideoMultiSet", "Cloud", new { splitNum = 9,reSet = true })"><button type="button" class="btn btn-block btn-info">多屏监控设置</button></a>
     </div>
 </div>
 <div class="row">
-@for (int i = 0; i < splitNum; i++)
-{
-    <div class="col-md-4">
-        <div class="box box-solid">
-            <div class="box-header with-border">
-                @*<h3 class="box-title">荧石摄像头</h3>*@
+    @for (int i = 0; i < splitNum; i++)
+    {
+        <div class="col-md-4">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    @*<h3 class="box-title">荧石摄像头</h3>*@
+                </div>
+                <video id="myPlayer_@i" class="myPlayer" poster="" controls playsInline webkit-playsinline autoplay>
+                    @if (i < liveLists.Count)
+                    {
+                        <source src="@Html.Raw(liveLists[i][1])" type="rtmp/flv" />
+                        <source src="@Html.Raw(liveLists[i][0])" type="application/x-mpegURL" />
+                    }
+                </video>
             </div>
-            <video id="myPlayer_@i" class="myPlayer" poster="" controls playsInline webkit-playsinline autoplay>
-                <source src="@Html.Raw(liveLists[i][1])" type="rtmp/flv" />
-                <source src="@Html.Raw(liveLists[i][0])" type="application/x-mpegURL" />
-
-            </video>
         </div>
-    </div>
-}
+    }
 </div>
 <script>
     @*for (int i = 0; i < @splitNum;i++)
@@ -50,20 +52,20 @@
     var player = new EZUIPlayer('myPlayer_0');
     var player = new EZUIPlayer('myPlayer_1');
     var player = new EZUIPlayer('myPlayer_2');
-    //var player = new EZUIPlayer('myPlayer_3');
-    //var player = new EZUIPlayer('myPlayer_4');
-    //var player = new EZUIPlayer('myPlayer_5');
-    //var player = new EZUIPlayer('myPlayer_6');
-    //var player = new EZUIPlayer('myPlayer_7');
-    //var player = new EZUIPlayer('myPlayer_8');
-    //var player = new EZUIPlayer('myPlayer_9');
-    //var player = new EZUIPlayer('myPlayer_10');
-    //var player = new EZUIPlayer('myPlayer_11');
-    //var player = new EZUIPlayer('myPlayer_12');
-    //var player = new EZUIPlayer('myPlayer_13');
-    //var player = new EZUIPlayer('myPlayer_14');
-    //var player = new EZUIPlayer('myPlayer_15');
-    
+    var player = new EZUIPlayer('myPlayer_3');
+    var player = new EZUIPlayer('myPlayer_4');
+    var player = new EZUIPlayer('myPlayer_5');
+    var player = new EZUIPlayer('myPlayer_6');
+    var player = new EZUIPlayer('myPlayer_7');
+    var player = new EZUIPlayer('myPlayer_8');
+    var player = new EZUIPlayer('myPlayer_9');
+    var player = new EZUIPlayer('myPlayer_10');
+    var player = new EZUIPlayer('myPlayer_11');
+    var player = new EZUIPlayer('myPlayer_12');
+    var player = new EZUIPlayer('myPlayer_13');
+    var player = new EZUIPlayer('myPlayer_14');
+    var player = new EZUIPlayer('myPlayer_15');
+
 //    player.on('error', function(){
 //        console.log('error');
 //    });

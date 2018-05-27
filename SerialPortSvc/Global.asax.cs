@@ -16,11 +16,26 @@ namespace SerialPortSvc
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            double intval = double.Parse(System.Configuration.ConfigurationManager.AppSettings["SvcIntval"].ToString());
+            try
+            {
+                string portName = System.Configuration.ConfigurationManager.AppSettings["COMPort"].ToString();
 
-            Timer t = new Timer(intval);
-            t.Elapsed += T_Elapsed;
-            t.Start();
+                WriteLog(portName,"SvcStart",DateTime.Now.ToString());
+
+                double intval = double.Parse(System.Configuration.ConfigurationManager.AppSettings["SvcIntval"].ToString());
+
+                Timer t = new Timer(intval);
+                t.Elapsed += T_Elapsed;
+                t.Start();
+            }
+            catch(Exception ex)
+            {
+                string portName = System.Configuration.ConfigurationManager.AppSettings["COMPort"].ToString();
+
+                WriteLog(portName, "SvcError", ex.Message);
+
+            }
+
         }
 
         private void T_Elapsed(object sender, ElapsedEventArgs e)

@@ -250,14 +250,14 @@
                         <ul class="treeview-menu">
                             <li><a href="@Url.Action("Index","Home")"><i class="fa fa-circle-o text-aqua"></i> <span> 控制面板</span></a></li>
                             <li><a href="@Url.Action("YSLive","Cloud")"><i class="fa fa-circle-o text-aqua"></i> <span> 我的设备</span></a></li>
-                            <li><a href="@Url.Action("YSLiveVideoMultiSet","Cloud",new { splitNum = 9})"><i class="fa fa-circle-o text-aqua"></i><span> 多屏监控（9）</span></a></li>
+                            <li><a href="@Url.Action("YSLiveVideoMultiSet","Cloud",new { splitNum = 9,reSet = false })"><i class="fa fa-circle-o text-aqua"></i><span> 多屏监控（9）</span></a></li>
                             @*<li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span> Menu3</span></a></li>
                                 <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span> Menu4</span></a></li>
                                 <li><a href="#"><i class="fa fa-circle-o text-aqua"></i> <span> Menu5</span></a></li>*@
                         </ul>
                     </li>
 
-                    @Html.Action("Manage","Home")
+                    @Html.Action("Manage", "Home")
                     @*<li class="treeview">
                             <a href="#">
                                 <i class="fa fa-share"></i> <span>Multilevel</span>

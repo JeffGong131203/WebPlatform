@@ -229,6 +229,7 @@
     <Compile Include="Models\Mapping\Portal_MenuMap.cs" />
     <Compile Include="Models\Mapping\Portal_UserMap.cs" />
     <Compile Include="Models\Mapping\Portal_User_CustomerMap.cs" />
+    <Compile Include="Models\Mapping\YSMultiSetMap.cs" />
     <Compile Include="Models\Portal_Auth.cs" />
     <Compile Include="Models\Portal_Auth_Menu.cs" />
     <Compile Include="Models\Portal_Auth_User.cs" />
@@ -239,8 +240,19 @@
     <Compile Include="Models\Portal_User.cs" />
     <Compile Include="Models\Portal_User_Customer.cs" />
     <Compile Include="Models\WebPlatformContext.cs" />
+    <Compile Include="Models\YSMultiSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Startup.cs" />
+    <Compile Include="Web References\WebComSvc\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AdminLTE\bower_components\bootstrap-colorpicker\dist\css\bootstrap-colorpicker.css" />
@@ -7429,6 +7441,10 @@
     <Content Include="AdminLTE\dist\css\adminlte.css.map" />
     <Content Include="AdminLTE\dist\css\adminlte.min.css.map" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -7440,6 +7456,11 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Web References\WebComSvc\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </Content>
+    <None Include="Web References\WebComSvc\SerialPort.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -7541,6 +7562,7 @@
     <Content Include="Views\Device\Edit.cshtml" />
     <Content Include="Views\Device\Index.cshtml" />
     <Content Include="Views\Cloud\YSManage.cshtml" />
+    <None Include="Web References\WebComSvc\SerialPort.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -7569,6 +7591,22 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://180.168.67.158:8001/WebCom6/SerialPort.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\WebComSvc\</RelPath>
+      <UpdateFromURL>http://180.168.67.158:8001/WebCom6/SerialPort.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>WebPlatform_WebComSvc_SerialPortData</CachedSettingsPropName>
+    </WebReferenceUrl>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
