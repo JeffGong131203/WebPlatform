@@ -1,0 +1,77 @@
+﻿
+@{
+    ViewBag.Title = "开关设备";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Guid devID = ViewBag.DevID;
+    System.Collections.ArrayList retArray = ViewBag.retArray;
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
+
+    WebPlatform.Models.Device_Info devInfo = db.Device_Info.Find(devID);
+
+    string submitUrl = Url.Action("IODeviceStartOFF", "Device");
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            8路开关
+            <small>@devInfo.DevName</small>
+        </h1>
+        @*<ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li class="active">控制面板</li>
+            </ol>*@
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            @for (int i = 0; i < 8; i++)
+            {
+                <div class="col-md-3">
+                    <div class="info-box" style="width:80%">
+                        <span class="info-box-icon bg-aqua" ><i class="ion ion-ios-gear-outline"></i></span>
+                        <div class="info-box-content">
+                            <div class="input-group" style="width:100%">
+                                <span class="info-box-text">开关:@(i+1)</span>
+                                <div id="@i.ToString()_SW1" class="switch" data-on="success" data-off="warning" data-on-label="开" data-off-label="关" >
+                                    @if (retArray[i].ToString() == "1")
+                                    {
+                                        <input id="@i.ToString()_CHK" type="checkbox" checked />
+                                    }
+                                    else
+                                    {
+                                        <input id="@i.ToString()_CHK" type="checkbox" />
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+
+                </div>
+            }
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.switch').on('switch-change', function (e, data) {
+            //var $el = $(data.el)
+            //    , value = data.value;
+            //console.log(e, $el, value);
+
+            var did = $(data.el).attr("id");
+            var setValue = data.value;
+
+            window.location.href = "@submitUrl" + "?devID=@devID&ioIndex=" + did.substring(0, 1) + "&onOff=" + setValue;
+        });
+    });
+
+</script>

@@ -7460,6 +7460,8 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </Content>
+    <Content Include="Views\Device\AirDeviceData.cshtml" />
+    <Content Include="Views\Device\IODeviceData.cshtml" />
     <None Include="Web References\WebComSvc\SerialPort.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

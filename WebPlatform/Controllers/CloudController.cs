@@ -440,7 +440,7 @@ namespace WebPlatform.Controllers
 
             if (!reSet && ysMultiSetList.Count()>0)
             {
-                return RedirectToAction("YSLiveVideoMulti");
+                return RedirectToAction("YSLiveVideoMulti",new { ysm = ysMultiSetList.ToList()[0].YSMultiSetJson});
             }
 
             YsAPI ys;

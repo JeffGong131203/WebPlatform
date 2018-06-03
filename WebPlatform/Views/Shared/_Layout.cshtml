@@ -297,28 +297,19 @@
             </section>
             <!-- /.sidebar -->
         </aside>
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            @*<section class="content-header">
+        @*<div class="content-wrapper">
 
-                    <h1>
-                        Buttons
-                        <small>Control panel</small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li><a href="#">UI</a></li>
-                        <li class="active">Buttons</li>
-                    </ol>
-                </section>*@
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+            </section>
             <!-- Main content -->
             <section class="content">
-                @RenderBody()
+               
+                </section>
 
-            </section>
-            <!-- /.content -->
-        </div>
+
+        </div>*@
+        @RenderBody()
         <!-- /.content-wrapper -->
         <footer class="main-footer">
             <div class="pull-right hidden-xs">
@@ -328,10 +319,8 @@
             reserved.
         </footer>
 
-    </div>
-
-    @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+        @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
 </body>
 </html>

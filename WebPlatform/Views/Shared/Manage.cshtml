@@ -38,6 +38,20 @@
 
             </ul>
         </li>
+
+        <li class="treeview">
+            <a href="#">
+                <i class="fa fa-share"></i> <span> 测试设备</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                </span>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="@Url.Action("AirDeviceData", "Device",new { DevID = "0CE2F474-CB5D-49E5-AC2F-0EB04251DD9A" })"><i class="fa fa-circle-o text-aqua"></i> <span> 空气传感器</span></a></li>
+                <li><a href="@Url.Action("IODeviceData", "Device", new { DevID = "E11910E0-4215-4744-A145-039B08E1338F" })"><i class="fa fa-circle-o text-aqua"></i> <span> 开关设备</span></a></li>
+
+            </ul>
+        </li>
     </ul>
 </li>
 

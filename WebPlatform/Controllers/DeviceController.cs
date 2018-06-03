@@ -128,6 +128,128 @@ namespace WebPlatform.Controllers
         }
 
         /// <summary>
+        /// 开关状态读取
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult IODeviceData(Guid devID)
+        {
+            string sendData = "01 01 00 00 00 18 3c 00";
+            Dictionary<string, string> dicRet = SendData(devID, sendData);
+
+            if(dicRet.Count == 0)
+            {
+                dicRet = SendData(devID, sendData);
+            }
+
+            ArrayList retArray = ResolveIODeviceData(dicRet["ReciveData"]);
+
+            ViewBag.DevID = devID;
+            ViewBag.retArray = retArray;
+
+            return View();
+        }
+
+        /// <summary>
+        /// 开关设置
+        /// </summary>
+        /// <param name="devID"></param>
+        public ActionResult IODeviceStartOFF(Guid devID,int ioIndex,bool onOff)
+        {
+            string sendData = string.Empty;
+
+            switch (ioIndex)
+            {
+                case 0:
+                    if(onOff)
+                    {
+                        sendData = "01 05 00 10 ff 00 8d ff";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 10 00 00 cc 0f";
+                    }
+                    break;
+                case 1:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 11 ff 00 dc 3f";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 11 00 00 9d cf";
+                    }
+                    break;
+                case 2:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 12 ff 00 2c 3f";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 12 00 00 6d cf";
+                    }
+                    break;
+                case 3:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 13 ff 00 7d ff";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 13 00 00 3c 0f";
+                    }
+                    break;
+                case 4:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 14 ff 00 cc 3e";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 14 00 00 8d ce";
+                    }
+                    break;
+                case 5:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 15 ff 00 9d fe";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 15 00 00 dc 0e";
+                    }
+                    break;
+                case 6:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 16 ff 00 6d fe";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 16 00 00 2c 0e";
+                    }
+                    break;
+                case 7:
+                    if (onOff)
+                    {
+                        sendData = "01 05 00 17 ff 00 3c 3e";
+                    }
+                    else
+                    {
+                        sendData = "01 05 00 17 00 00 7d ce";
+                    }
+                    break;
+            }
+
+            SendData(devID, sendData);
+
+            return RedirectToAction("IODeviceData",new { devID = devID});
+        }
+
+
+        /// <summary>
         /// 空气传感器读取状态
         /// </summary>
         /// <param name="devID"></param>
@@ -135,32 +257,13 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult AirDeviceData(Guid devID)
         {
-            WebComSvc.SerialPortData spd = new WebComSvc.SerialPortData();
-            spd.Url = GetWebComUrl(devID);
+            string sendData = "01 03 00 00 00 05 85 c9";
+            Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            spd.SendData("01 03 00 00 00 05 85 c9",devID.ToString());
-
-            string retData = spd.GetReciveData();
-
-            DateTime t1 = DateTime.Now;
-            DateTime t2 = DateTime.Now;
-            TimeSpan ts = t2 - t1;
-
-            while(string.IsNullOrEmpty(retData))
+            if(dicRet.Count==0)
             {
-                retData = spd.GetReciveData();
-
-                Thread.Sleep(200);
-
-                t2 = DateTime.Now;
-                ts = t2 - t1;
-                if(ts.TotalSeconds >5)
-                {
-                    break;
-                }
+                dicRet = SendData(devID, sendData);
             }
-
-            Dictionary<string,string> dicRet= JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
 
             ArrayList retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
 
@@ -168,6 +271,67 @@ namespace WebPlatform.Controllers
             ViewBag.retArray = retArray;
 
             return View();
+        }
+
+
+        /// <summary>
+        /// 指令发送、接收
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <param name="sendData"></param>
+        /// <returns></returns>
+        private Dictionary<string,string> SendData(Guid devID,string sendData)
+        {
+            WebComSvc.SerialPortData spd = new WebComSvc.SerialPortData();
+            spd.Url = GetWebComUrl(devID);
+
+            spd.SendData(sendData, devID.ToString());
+
+            string retData = spd.GetReciveData();
+
+            DateTime t1 = DateTime.Now;
+            DateTime t2 = DateTime.Now;
+            TimeSpan ts = t2 - t1;
+
+            while (string.IsNullOrEmpty(retData))
+            {
+                retData = spd.GetReciveData();
+
+                Thread.Sleep(200);
+
+                t2 = DateTime.Now;
+                ts = t2 - t1;
+                if (ts.TotalSeconds > 5)
+                {
+                    break;
+                }
+            }
+
+            Dictionary<string, string> dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
+
+            return dicRet;
+        }
+
+        private ArrayList ResolveIODeviceData(string data)
+        {
+            ArrayList retArray = new ArrayList();
+
+            string[] byteData = data.Replace("0x", "@").Split("@".ToCharArray());
+
+            if (byteData.Length == 8)
+            {
+                string ioState = System.Convert.ToString(System.Convert.ToInt32(byteData[6], 16), 2).PadLeft(8, '0');
+
+                if (ioState.Length == 8)
+                {
+                    for(int i= 7;i>=0;i--)
+                    {
+                        retArray.Add(ioState[i].ToString());
+                    }
+                }
+            }
+
+            return retArray;
         }
 
         /// <summary>
