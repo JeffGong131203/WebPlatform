@@ -8,6 +8,7 @@
 @using (Html.BeginForm())
 {
     <input type="submit" value="批量添加设备" onclick='this.form.action="@Url.Action("AddDevice")" ' />
+    <input type="submit" value="批量添加子账号授权" onclick='this.form.action="@Url.Action("AddSubAccounts")" ' />
 
     <div class="form-group">
         <label>输入信息</label>

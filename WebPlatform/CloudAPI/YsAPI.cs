@@ -138,7 +138,7 @@ namespace WebPlatform.CloudAPI
             string retMsg = string.Empty;
 
             //string policy = "{ "Statement": [{ "Permission": "Get,Real",  "Resource": ["dev: 126044895","dev: C03225730"]}]}";
-            string policy = @"{ ""Statement"": [{ ""Permission"": ""{0}"",  ""Resource"": [{1}]}]}";
+            //string policy = "{ \"Statement\": [{ \"Permission\": \"{0}\",  \"Resource\": [{1}]}]}";
 
             string strPermission = string.Empty;
             string strResource = string.Empty;
@@ -168,11 +168,11 @@ namespace WebPlatform.CloudAPI
                 {
                     if (i == 0)
                     {
-                        strResource = string.Format(@"""dev: {0}""", resource[i]);
+                        strResource = string.Format("\"dev:{0}\"", resource[i]);
                     }
                     else
                     {
-                        strResource += "," + string.Format(@"""dev: {0}""", resource[i]);
+                        strResource += "," + string.Format("\"dev:{0}\"", resource[i]);
                     }
                 }
             }
@@ -185,7 +185,10 @@ namespace WebPlatform.CloudAPI
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 parameters.Add("accessToken", accessToken);
                 parameters.Add("accountId", accountID);
-                parameters.Add("policy", string.Format(policy, strPermission, strResource));
+
+                string strPolicy = "{\"Statement\": [{ \"Permission\": \"" + strPermission + "\",  \"Resource\": [" + strResource + "]}]}";
+
+                parameters.Add("policy", strPolicy);
 
                 string retStr = string.Empty;
 
@@ -202,6 +205,39 @@ namespace WebPlatform.CloudAPI
             }
 
             return retMsg;
+        }
+
+        /// <summary>
+        /// 根据子账号名称获取子账号ID
+        /// </summary>
+        /// <param name="accountName"></param>
+        /// <returns></returns>
+        public string getSubAccountID(string accountName)
+        {
+            string retStr = string.Empty;
+
+            string accessToken = getAccessToken(false);
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                string url = "https://open.ys7.com/api/lapp/ram/account/get";
+
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                parameters.Add("accessToken", accessToken);
+                parameters.Add("accountName", accountName);
+
+                JObject jStr = JObject.Parse(HTTPHelper.HttpPostResponse(url, parameters));
+
+                if (jStr["code"].ToString() == "200")
+                {
+                    retStr = jStr["data"]["accountId"].ToString();
+                }
+                else //API Error,Write Log
+                {
+                    APIError(url, parameters, jStr);
+                }
+            }
+
+            return retStr;
         }
 
         /// <summary>
@@ -263,7 +299,7 @@ namespace WebPlatform.CloudAPI
             int page = 0;
             int size = 0;
 
-            string accessToken = getAccessToken(false);
+            string accessToken = getAccessToken(true);
             if (!string.IsNullOrEmpty(accessToken))
             {
                 string url = "https://open.ys7.com/api/lapp/device/list";

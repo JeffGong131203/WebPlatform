@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -105,6 +106,51 @@ namespace WebPlatform.Controllers
             {
                 return Content("");
             }
+        }
+
+        [Authorize]
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult ChangePassword(string timeStamp)
+        {
+            Guid uid = GetUserID();
+
+            string oldpsw = Request.Form["oldpsw"];
+
+            string newpsw1 = Request.Form["newpsw1"];
+            string newpsw2 = Request.Form["newpsw2"];
+
+            if(newpsw1 != newpsw2)
+            {
+                ViewBag.errMsg = "两次密码输入不一致";
+            }
+            else
+            {
+                IEnumerable<Portal_User> userList = db.Portal_User.Where(userid => userid.ID == uid && userid.Loginpsw == oldpsw).ToList();
+
+                if(userList.Count()>0)
+                {
+                    Portal_User uInfo = userList.ToList()[0];
+
+                    uInfo.Loginpsw = newpsw1;
+
+                    db.Entry(uInfo).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    ViewBag.errMsg = "密码修改成功";
+                }
+                else
+                {
+                    ViewBag.errMsg = "原密码错误";
+                }
+            }
+
+            return View();
         }
 
         [HttpPost]

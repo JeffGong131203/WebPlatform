@@ -526,5 +526,57 @@ namespace WebPlatform.Controllers
 
             return View("YSManage");
         }
+
+
+        /// <summary>
+        /// 批量添加萤石子账号
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize(Roles = "admin")]
+        public ActionResult AddSubAccounts()
+        {
+            string ret = string.Empty;
+
+            string devList = Request["SendData"];
+
+            if (!string.IsNullOrEmpty(devList))
+            {
+                YsAPI ys;
+                //string accountID = string.Empty;
+                string appKey = System.Configuration.ConfigurationManager.AppSettings["YsAppKey"].ToString();
+                string secret = System.Configuration.ConfigurationManager.AppSettings["YsSecret"].ToString();
+
+                //GetUserYSAccount(out accountID, out appKey, out secret);
+                ys = new YsAPI(appKey, secret);
+
+                //string token = ys.getAccessToken(false);
+
+                JArray dev = Newtonsoft.Json.Linq.JArray.Parse(devList);
+
+                for (int i = 0; i < dev.Count(); i++)
+                {
+                    string acctName = dev[i]["AccountName"].ToString();
+
+                    string[] subDevList = dev[i]["DevList"].ToString().Split(",".ToCharArray());
+
+                    string accountID = ys.addSubAccount(acctName, acctName);
+                    if (!string.IsNullOrEmpty(accountID))
+                    {
+                        ret += ys.SetSubAccountPolicy(accountID, new string[] { }, subDevList);
+                    }
+                    else//已存在子账号，获取后添加权限
+                    {
+                        accountID = ys.getSubAccountID(acctName);
+
+                        ret += ys.SetSubAccountPolicy(accountID, new string[] { }, subDevList);
+                    }
+                }
+            }
+
+                ViewBag.retMsg = ret;
+
+                return View("YSManage");
+        }
     }
 }
