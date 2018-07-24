@@ -29,6 +29,8 @@ namespace WebPlatform.Models
         public DbSet<Device_Info> Device_Info { get; set; }
         public DbSet<Device_User> Device_User { get; set; }
         public DbSet<YSMultiSet> YSMultiSet { get; set; }
+        public DbSet<Device_Store> Device_Store { get; set; }
+        public DbSet<Device_Send> Device_Send { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -45,6 +47,8 @@ namespace WebPlatform.Models
             modelBuilder.Configurations.Add(new Device_InfoMap());
             modelBuilder.Configurations.Add(new Device_UserMap());
             modelBuilder.Configurations.Add(new YSMultiSetMap());
+            modelBuilder.Configurations.Add(new Device_StoreMap());
+            modelBuilder.Configurations.Add(new Device_SendMap());
         }
     }
 }

@@ -19,9 +19,54 @@ namespace WebPlatform.Controllers
 
         // GET: Device
         [Authorize]
-        public ActionResult Index()
+        public ActionResult Index(string devType)
         {
-            return View(db.Device_Info.ToList());
+            IEnumerable devList;
+
+            if(string.IsNullOrEmpty(devType))
+            {
+                devList = db.Device_Info.OrderBy(dev => dev.DevCode).ToList();
+            }
+            else
+            {
+                devList = db.Device_Info.Where(dev => dev.DevType == devType).OrderBy(dev => dev.DevCode).ToList();
+            }
+
+            return View(devList);
+        }
+
+        // GET: Device
+        [Authorize]
+        public ActionResult List(string devType)
+        {
+            IEnumerable devList;
+
+            if (string.IsNullOrEmpty(devType))
+            {
+                devList = db.Device_Info.OrderBy(dev => dev.DevCode).ToList();
+            }
+            else
+            {
+                devList = db.Device_Info.Where(dev => dev.DevType == devType).OrderBy(dev => dev.DevCode).ToList();
+            }
+
+            return View(devList);
+        }
+
+        [Authorize]
+        public ActionResult DeviceData(Guid id,string devType)
+        {
+            switch (devType.ToLower())
+            {
+                case "air":
+                    return RedirectToAction("AirDeviceData",new { devID = id });
+                case "io":
+                    return RedirectToAction("IODeviceData", new { devID = id });
+                //case "panel":
+                //    break;
+                default:
+                    return RedirectToAction("List",new { devType = devType});
+            }
         }
 
         // GET: Device/Details/5
@@ -135,15 +180,21 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult IODeviceData(Guid devID)
         {
-            string sendData = "01 01 00 00 00 18 3c 00";
+            string sendData = GetSendData(devID);
             Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            if(dicRet.Count == 0)
+            if (!dicRet.ContainsKey("ReciveData"))
             {
+                Thread.Sleep(500);
+
                 dicRet = SendData(devID, sendData);
             }
 
-            ArrayList retArray = ResolveIODeviceData(dicRet["ReciveData"]);
+            ArrayList retArray = new ArrayList();
+            if (dicRet.ContainsKey("ReciveData"))
+            {
+                retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+            }
 
             ViewBag.DevID = devID;
             ViewBag.retArray = retArray;
@@ -257,22 +308,41 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult AirDeviceData(Guid devID)
         {
-            string sendData = "01 03 00 00 00 05 85 c9";
+            string sendData = GetSendData(devID);
             Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            if(dicRet.Count==0)
+            if(!dicRet.ContainsKey("ReciveData"))
             {
+                Thread.Sleep(500);
+
                 dicRet = SendData(devID, sendData);
             }
 
-            ArrayList retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+            ArrayList retArray = new ArrayList();
+            if (dicRet.ContainsKey("ReciveData"))
+            {
+                retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+            }
 
             ViewBag.DevID = devID;
             ViewBag.retArray = retArray;
 
             return View();
         }
+        
+        private string GetSendData(Guid devID)
+        {
+            string sendData = string.Empty;
 
+            IEnumerable<Device_Send> sendDataList = db.Device_Send.Where(dev => dev.DeviceID == devID).ToList();
+
+            if(sendDataList.Count() > 0)
+            {
+                sendData = sendDataList.ToList()[0].SendData;
+            }
+
+            return sendData;
+        }
 
         /// <summary>
         /// 指令发送、接收
@@ -307,7 +377,12 @@ namespace WebPlatform.Controllers
                 }
             }
 
-            Dictionary<string, string> dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
+            Dictionary<string, string> dicRet = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(retData))
+            {
+                dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
+            }
 
             return dicRet;
         }
