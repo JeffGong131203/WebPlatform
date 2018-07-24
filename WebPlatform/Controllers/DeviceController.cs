@@ -193,7 +193,7 @@ namespace WebPlatform.Controllers
             ArrayList retArray = new ArrayList();
             if (dicRet.ContainsKey("ReciveData"))
             {
-                retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+                retArray = ResolveIODeviceData(dicRet["ReciveData"]);
             }
 
             ViewBag.DevID = devID;
