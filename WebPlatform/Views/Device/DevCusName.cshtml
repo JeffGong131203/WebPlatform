@@ -1,0 +1,166 @@
+﻿@model WebPlatform.Models.Device_Info
+
+@{
+    ViewBag.Title = "DevCusName";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Dictionary<string, string> propertyJsonDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(Model.PropertyJson);
+}
+
+<h2>设备名称自定义</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.ID)
+    @Html.HiddenFor(model => model.DevCode);
+    @Html.HiddenFor(model => model.DevName);
+    @Html.HiddenFor(model => model.ParentID);
+    @Html.HiddenFor(model => model.DevType);
+    @Html.HiddenFor(model => model.PropertyJson);
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <h3 class="box-title">设备自定义名称</h3>
+                </div>
+                <div class="form-group">
+                    <label>设备自定义名称</label>
+                    <input type="text" name="DevCusName" class="form-control" placeholder="" value="@propertyJsonDic["DevCusName"]">
+                </div>
+            </div>
+        </div>
+
+        @if (Model.DevType == "IO")
+        {
+            <div class="col-md-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">输入项名称</h3>
+                    </div>
+                    <div class="row">
+                        @for (int i = 1; i <= 8; i++)
+                        {
+                            string inputName = "in" + i.ToString();
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>输入 @i</label>
+                                    <input type="text" name="@inputName" class="form-control" placeholder="" value="@propertyJsonDic[inputName]">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">输出项名称</h3>
+                    </div>
+                    <div class="row">
+                        @for (int i = 1; i <= 8; i++)
+                        {
+                            string inputName = "out" + i.ToString();
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>输出 @i</label>
+                                    <input type="text" name="@inputName" class="form-control" placeholder="" value="@propertyJsonDic[inputName]">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">开关名称</h3>
+                    </div>
+                    <div class="row">
+                        @for (int i = 1; i <= 8; i++)
+                        {
+                            string inputName = "sw" + i.ToString();
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>开关 @i</label>
+                                    <input type="text" name="@inputName" class="form-control" placeholder="" value="@propertyJsonDic[inputName]">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-1">
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+            <div class="col-sm-1">
+                <a href="@Url.Action("List","Device",new { DevType = Model.DevType})"><button type="button" class="btn btn-primary">返回</button></a>
+            </div>
+        </div>
+    </div>
+
+
+    @*<div class="form-horizontal">
+            <h4>设备信息</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.ID)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DevCode, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DevCode, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DevCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DevName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DevName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DevName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ParentID, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ParentID, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ParentID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DevType, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DevType, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DevType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PropertyJson, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PropertyJson, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PropertyJson, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="保存" class="btn btn-default" />
+                </div>
+            </div>
+        </div>*@
+}
+
+

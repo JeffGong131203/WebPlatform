@@ -16,6 +16,7 @@ namespace WebPlatform.Controllers
     public class DeviceController : Controller
     {
         private WebPlatformContext db = new WebPlatformContext();
+        private WebPlatformDataContext dbData = new WebPlatformDataContext();
 
         // GET: Device
         [Authorize]
@@ -173,6 +174,83 @@ namespace WebPlatform.Controllers
         }
 
         /// <summary>
+        /// 设备自定义属性名
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult DevCusName(Guid? devID)
+        {
+            if (devID == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Device_Info device_Info = db.Device_Info.Find(devID);
+            if (device_Info == null)
+            {
+                return HttpNotFound();
+            }
+
+            string viewName = string.Empty;
+
+            //if(device_Info.DevType == "IO")
+            //{
+            //    viewName = "IOCusName";
+            //}
+            //else
+            //{
+            //    viewName = "DevCusName";
+            //}
+
+            return View(device_Info);
+        }
+
+        /// <summary>
+        /// 设备自定义属性名称后台操作
+        /// </summary>
+        /// <param name="device_Info"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public ActionResult DevCusName(Device_Info deviceInfo)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Entry(deviceInfo).State = EntityState.Modified;
+
+                Dictionary<string ,string> propertyJsonDic = JsonConvert.DeserializeObject<Dictionary<string, string>>(deviceInfo.PropertyJson);
+                Dictionary<string, string> propertyJsonDicNew = new Dictionary<string, string>();
+
+                foreach(KeyValuePair<string ,string> kvp in propertyJsonDic)
+                {
+                    if(kvp.Key.ToLower() != "addcode")
+                    {
+                        if(!string.IsNullOrEmpty(Request.Form[kvp.Key]))
+                        {
+                            propertyJsonDicNew.Add(kvp.Key, Request.Form[kvp.Key]);
+                        }
+                        else
+                        {
+                            propertyJsonDicNew.Add(kvp.Key, string.Empty);
+                        }
+                    }
+                    else
+                    {
+                        propertyJsonDicNew.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+                deviceInfo.PropertyJson = JsonConvert.SerializeObject(propertyJsonDicNew, Formatting.Indented);
+
+                db.SaveChanges();
+                return RedirectToAction("List", new { devType = deviceInfo.DevType});
+            }
+
+            return RedirectToAction("DevCusName", new { devID = deviceInfo.ID });
+        }
+
+        /// <summary>
         /// 开关状态读取
         /// </summary>
         /// <param name="devID"></param>
@@ -208,88 +286,111 @@ namespace WebPlatform.Controllers
         /// <param name="devID"></param>
         public ActionResult IODeviceStartOFF(Guid devID,int ioIndex,bool onOff)
         {
+            Device_Info device_Info = db.Device_Info.Find(devID);
+            if (device_Info == null)
+            {
+                return HttpNotFound();
+            }
+
             string sendData = string.Empty;
+            string addCode = JsonConvert.DeserializeObject<Dictionary<string, string>>(device_Info.PropertyJson)["addCode"];
 
             switch (ioIndex)
             {
                 case 0:
                     if(onOff)
                     {
-                        sendData = "01 05 00 10 ff 00 8d ff";
+                        //sendData = "01 05 00 10 ff 00 8d ff";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050010ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 10 00 00 cc 0f";
+                        //sendData = "01 05 00 10 00 00 cc 0f";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500100000");
                     }
                     break;
                 case 1:
                     if (onOff)
                     {
-                        sendData = "01 05 00 11 ff 00 dc 3f";
+                        //sendData = "01 05 00 11 ff 00 dc 3f";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050011ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 11 00 00 9d cf";
+                        //sendData = "01 05 00 11 00 00 9d cf";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500110000");
                     }
                     break;
                 case 2:
                     if (onOff)
                     {
-                        sendData = "01 05 00 12 ff 00 2c 3f";
+                        //sendData = "01 05 00 12 ff 00 2c 3f";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050012ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 12 00 00 6d cf";
+                        //sendData = "01 05 00 12 00 00 6d cf";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500120000");
                     }
                     break;
                 case 3:
                     if (onOff)
                     {
-                        sendData = "01 05 00 13 ff 00 7d ff";
+                        //sendData = "01 05 00 13 ff 00 7d ff";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050013ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 13 00 00 3c 0f";
+                        //sendData = "01 05 00 13 00 00 3c 0f";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500130000");
                     }
                     break;
                 case 4:
                     if (onOff)
                     {
-                        sendData = "01 05 00 14 ff 00 cc 3e";
+                        //sendData = "01 05 00 14 ff 00 cc 3e";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050014ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 14 00 00 8d ce";
+                        //sendData = "01 05 00 14 00 00 8d ce";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500140000");
                     }
                     break;
                 case 5:
                     if (onOff)
                     {
-                        sendData = "01 05 00 15 ff 00 9d fe";
+                        //sendData = "01 05 00 15 ff 00 9d fe";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050015ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 15 00 00 dc 0e";
+                        //sendData = "01 05 00 15 00 00 dc 0e";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500150000");
                     }
                     break;
                 case 6:
                     if (onOff)
                     {
-                        sendData = "01 05 00 16 ff 00 6d fe";
+                        //sendData = "01 05 00 16 ff 00 6d fe";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050016ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 16 00 00 2c 0e";
+                        //sendData = "01 05 00 16 00 00 2c 0e";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500160000");
                     }
                     break;
                 case 7:
                     if (onOff)
                     {
-                        sendData = "01 05 00 17 ff 00 3c 3e";
+                        //sendData = "01 05 00 17 ff 00 3c 3e";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "050017ff00");
                     }
                     else
                     {
-                        sendData = "01 05 00 17 00 00 7d ce";
+                        //sendData = "01 05 00 17 00 00 7d ce";
+                        sendData = BLL.BLLHelper.CRC_16(addCode + "0500170000");
                     }
                     break;
             }
@@ -299,6 +400,28 @@ namespace WebPlatform.Controllers
             return RedirectToAction("IODeviceData",new { devID = devID});
         }
 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        private ArrayList AirDeviceDataList(Guid devID)
+        {
+            ArrayList airDataList = new ArrayList();
+
+            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID).OrderByDescending(dev => dev.SendTime).Take(50).ToList();
+
+            foreach(Device_Data ddata in devDataList)
+            {
+                ArrayList retArray = ResolveAirDeviceData(ddata.ReciveData);
+                retArray.Insert(0, ddata.SendTime);
+
+                airDataList.Add(retArray);
+            }
+
+            return airDataList;
+        }
 
         /// <summary>
         /// 空气传感器读取状态
@@ -311,7 +434,7 @@ namespace WebPlatform.Controllers
             string sendData = GetSendData(devID);
             Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            if(!dicRet.ContainsKey("ReciveData"))
+            if (!dicRet.ContainsKey("ReciveData"))
             {
                 Thread.Sleep(500);
 
@@ -324,8 +447,19 @@ namespace WebPlatform.Controllers
                 retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
             }
 
+            ArrayList dataList = AirDeviceDataList(devID);
+            
             ViewBag.DevID = devID;
+
+            //ArrayList retArray = new ArrayList();
+            //retArray.Add(((ArrayList)dataList[0])[1]);
+            //retArray.Add(((ArrayList)dataList[0])[2]);
+            //retArray.Add(((ArrayList)dataList[0])[3]);
+            //retArray.Add(((ArrayList)dataList[0])[4]);
+            //retArray.Add(((ArrayList)dataList[0])[5]);
+            
             ViewBag.retArray = retArray;
+            ViewBag.dataList = dataList;
 
             return View();
         }

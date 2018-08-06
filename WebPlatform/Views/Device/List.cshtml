@@ -23,9 +23,9 @@
         <th>
             @Html.DisplayNameFor(model => model.DevType)
         </th>
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => model.PropertyJson)
-        </th>
+        </th>*@
         <th></th>
     </tr>
 
@@ -48,11 +48,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.DevType)
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.PropertyJson)
-            </td>
+            </td>*@
             <td>
                 @Html.ActionLink("查看数据", "DeviceData", new { id = item.ID,devType = item.DevType }) |
+            </td>
+            <td>
+                @Html.ActionLink("设置别名", "DevCusName", new { devID = item.ID, devType = item.DevType }) |
             </td>
         </tr>
     }
