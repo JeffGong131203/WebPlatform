@@ -11,6 +11,8 @@
 
     WebPlatform.Models.Device_Info devInfo = db.Device_Info.Find(devID);
 
+    Dictionary<string, string> devDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(devInfo.PropertyJson);
+
     //实时数据处理
     string pm25 = string.Empty;
     string tmp = string.Empty;
@@ -76,7 +78,7 @@
 
 <h1>
     空气传感器
-    <small>@devInfo.DevName</small>
+    <small>@devDic["DevCusName"]</small>
 </h1>
 <div class="row">
     <div class="col-sm-1">
