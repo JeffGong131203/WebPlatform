@@ -26,6 +26,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -7472,6 +7473,7 @@
     <Content Include="Views\Home\ChangePassword.cshtml" />
     <Content Include="Views\Device\List.cshtml" />
     <Content Include="Views\Device\DevCusName.cshtml" />
+    <Content Include="Views\Device\PanelDeviceData.cshtml" />
     <None Include="Web References\WebComSvc\SerialPort.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

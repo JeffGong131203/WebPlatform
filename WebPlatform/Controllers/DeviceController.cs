@@ -24,7 +24,7 @@ namespace WebPlatform.Controllers
         {
             IEnumerable devList;
 
-            if(string.IsNullOrEmpty(devType))
+            if (string.IsNullOrEmpty(devType))
             {
                 devList = db.Device_Info.OrderBy(dev => dev.DevCode).ToList();
             }
@@ -55,18 +55,18 @@ namespace WebPlatform.Controllers
         }
 
         [Authorize]
-        public ActionResult DeviceData(Guid id,string devType)
+        public ActionResult DeviceData(Guid id, string devType)
         {
             switch (devType.ToLower())
             {
                 case "air":
-                    return RedirectToAction("AirDeviceData",new { devID = id });
+                    return RedirectToAction("AirDeviceData", new { devID = id });
                 case "io":
                     return RedirectToAction("IODeviceData", new { devID = id });
-                //case "panel":
-                //    break;
+                case "panel":
+                    return RedirectToAction("PanelDeviceData", new { devID = id }); ;
                 default:
-                    return RedirectToAction("List",new { devType = devType});
+                    return RedirectToAction("List", new { devType = devType });
             }
         }
 
@@ -103,10 +103,10 @@ namespace WebPlatform.Controllers
         {
             //if (ModelState.IsValid)
             //{
-                device_Info.ID = Guid.NewGuid();
-                db.Device_Info.Add(device_Info);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+            device_Info.ID = Guid.NewGuid();
+            db.Device_Info.Add(device_Info);
+            db.SaveChanges();
+            return RedirectToAction("Index");
             //}
 
             //return View(device_Info);
@@ -219,14 +219,14 @@ namespace WebPlatform.Controllers
             {
                 db.Entry(deviceInfo).State = EntityState.Modified;
 
-                Dictionary<string ,string> propertyJsonDic = JsonConvert.DeserializeObject<Dictionary<string, string>>(deviceInfo.PropertyJson);
+                Dictionary<string, string> propertyJsonDic = JsonConvert.DeserializeObject<Dictionary<string, string>>(deviceInfo.PropertyJson);
                 Dictionary<string, string> propertyJsonDicNew = new Dictionary<string, string>();
 
-                foreach(KeyValuePair<string ,string> kvp in propertyJsonDic)
+                foreach (KeyValuePair<string, string> kvp in propertyJsonDic)
                 {
-                    if(kvp.Key.ToLower() != "addcode")
+                    if (kvp.Key.ToLower() != "addcode")
                     {
-                        if(!string.IsNullOrEmpty(Request.Form[kvp.Key]))
+                        if (!string.IsNullOrEmpty(Request.Form[kvp.Key]))
                         {
                             propertyJsonDicNew.Add(kvp.Key, Request.Form[kvp.Key]);
                         }
@@ -244,7 +244,7 @@ namespace WebPlatform.Controllers
                 deviceInfo.PropertyJson = JsonConvert.SerializeObject(propertyJsonDicNew, Formatting.Indented);
 
                 db.SaveChanges();
-                return RedirectToAction("List", new { devType = deviceInfo.DevType});
+                return RedirectToAction("List", new { devType = deviceInfo.DevType });
             }
 
             return RedirectToAction("DevCusName", new { devID = deviceInfo.ID });
@@ -284,7 +284,7 @@ namespace WebPlatform.Controllers
         /// 开关设置
         /// </summary>
         /// <param name="devID"></param>
-        public ActionResult IODeviceStartOFF(Guid devID,int ioIndex,bool onOff)
+        public ActionResult IODeviceStartOFF(Guid devID, int ioIndex, bool onOff)
         {
             Device_Info device_Info = db.Device_Info.Find(devID);
             if (device_Info == null)
@@ -298,7 +298,7 @@ namespace WebPlatform.Controllers
             switch (ioIndex)
             {
                 case 0:
-                    if(onOff)
+                    if (onOff)
                     {
                         //sendData = "01 05 00 10 ff 00 8d ff";
                         sendData = BLL.BLLHelper.CRC_16(addCode + "050010ff00");
@@ -397,10 +397,10 @@ namespace WebPlatform.Controllers
 
             SendData(devID, sendData);
 
-            return RedirectToAction("IODeviceData",new { devID = devID});
+            return RedirectToAction("IODeviceData", new { devID = devID });
         }
 
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -412,12 +412,16 @@ namespace WebPlatform.Controllers
 
             IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID).OrderByDescending(dev => dev.SendTime).Take(50).ToList();
 
-            foreach(Device_Data ddata in devDataList)
+            foreach (Device_Data ddata in devDataList)
             {
                 ArrayList retArray = ResolveAirDeviceData(ddata.ReciveData);
-                retArray.Insert(0, ddata.SendTime);
 
-                airDataList.Add(retArray);
+                if (retArray.Count == 5)
+                {
+                    retArray.Insert(0, ddata.SendTime.ToShortTimeString());
+
+                    airDataList.Add(retArray);
+                }
             }
 
             return airDataList;
@@ -432,45 +436,45 @@ namespace WebPlatform.Controllers
         public ActionResult AirDeviceData(Guid devID)
         {
             string sendData = GetSendData(devID);
-            Dictionary<string, string> dicRet = SendData(devID, sendData);
+            //Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            if (!dicRet.ContainsKey("ReciveData"))
-            {
-                Thread.Sleep(500);
+            //if (!dicRet.ContainsKey("ReciveData"))
+            //{
+            //    Thread.Sleep(500);
 
-                dicRet = SendData(devID, sendData);
-            }
-
-            ArrayList retArray = new ArrayList();
-            if (dicRet.ContainsKey("ReciveData"))
-            {
-                retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
-            }
-
-            ArrayList dataList = AirDeviceDataList(devID);
-            
-            ViewBag.DevID = devID;
+            //    dicRet = SendData(devID, sendData);
+            //}
 
             //ArrayList retArray = new ArrayList();
-            //retArray.Add(((ArrayList)dataList[0])[1]);
-            //retArray.Add(((ArrayList)dataList[0])[2]);
-            //retArray.Add(((ArrayList)dataList[0])[3]);
-            //retArray.Add(((ArrayList)dataList[0])[4]);
-            //retArray.Add(((ArrayList)dataList[0])[5]);
-            
+            //if (dicRet.ContainsKey("ReciveData"))
+            //{
+            //    retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+            //}
+
+            ArrayList dataList = AirDeviceDataList(devID);
+
+            ViewBag.DevID = devID;
+
+            ArrayList retArray = new ArrayList();
+            retArray.Add(((ArrayList)dataList[0])[1]);
+            retArray.Add(((ArrayList)dataList[0])[2]);
+            retArray.Add(((ArrayList)dataList[0])[3]);
+            retArray.Add(((ArrayList)dataList[0])[4]);
+            retArray.Add(((ArrayList)dataList[0])[5]);
+
             ViewBag.retArray = retArray;
             ViewBag.dataList = dataList;
 
             return View();
         }
-        
+
         private string GetSendData(Guid devID)
         {
             string sendData = string.Empty;
 
             IEnumerable<Device_Send> sendDataList = db.Device_Send.Where(dev => dev.DeviceID == devID).ToList();
 
-            if(sendDataList.Count() > 0)
+            if (sendDataList.Count() > 0)
             {
                 sendData = sendDataList.ToList()[0].SendData;
             }
@@ -484,7 +488,7 @@ namespace WebPlatform.Controllers
         /// <param name="devID"></param>
         /// <param name="sendData"></param>
         /// <returns></returns>
-        private Dictionary<string,string> SendData(Guid devID,string sendData)
+        private Dictionary<string, string> SendData(Guid devID, string sendData)
         {
             WebComSvc.SerialPortData spd = new WebComSvc.SerialPortData();
             spd.Url = GetWebComUrl(devID);
@@ -521,6 +525,121 @@ namespace WebPlatform.Controllers
             return dicRet;
         }
 
+        /// <summary>
+        /// 面板读取近50条数据
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        private ArrayList PanelDeviceDataList(Guid devID)
+        {
+            ArrayList panelDataList = new ArrayList();
+
+            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID).OrderByDescending(dev => dev.SendTime).Take(50).ToList();
+
+            foreach (Device_Data ddata in devDataList)
+            {
+                ArrayList retArray = ResolvePanelDeviceData(ddata.ReciveData);
+
+                if (retArray.Count > 5)
+                {
+                    retArray.Insert(0, ddata.SendTime.ToShortTimeString());
+
+                    panelDataList.Add(retArray);
+                }
+            }
+
+            return panelDataList;
+        }
+
+        /// <summary>
+        /// 面板读取状态
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult PanelDeviceData(Guid devID)
+        {
+            string sendData = GetSendData(devID);
+            //Dictionary<string, string> dicRet = SendData(devID, sendData);
+
+            //if (!dicRet.ContainsKey("ReciveData"))
+            //{
+            //    Thread.Sleep(500);
+
+            //    dicRet = SendData(devID, sendData);
+            //}
+
+            //ArrayList retArray = new ArrayList();
+            //if (dicRet.ContainsKey("ReciveData"))
+            //{
+            //    retArray = ResolvePanelDeviceData(dicRet["ReciveData"]);
+            //}
+
+            ArrayList dataList = PanelDeviceDataList(devID);
+
+            ViewBag.DevID = devID;
+
+            ArrayList retArray = new ArrayList();
+            for (int i = 1; i < ((ArrayList)dataList[0]).Count; i++)
+            {
+                retArray.Add(((ArrayList)dataList[0])[i]);
+            }
+
+            ViewBag.retArray = retArray;
+            ViewBag.dataList = dataList;
+
+            return View();
+        }
+
+        /// <summary>
+        /// 面板数据字节解析
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private ArrayList ResolvePanelDeviceData(string data)
+        {
+            ArrayList retArray = new ArrayList();
+
+            string[] byteData = data.Replace("0x", "@").Split("@".ToCharArray());
+
+            if (byteData.Length > 22)
+            {
+                //状态
+                retArray.Add(Int32.Parse(byteData[5], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //模式
+                retArray.Add(Int32.Parse(byteData[7], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //设置温度
+                retArray.Add(Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber).ToString() + "." + Int32.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //风机模式
+                retArray.Add(Int32.Parse(byteData[11], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //机型
+                retArray.Add(Int32.Parse(byteData[13], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //低温保护温度
+                retArray.Add(Int32.Parse(byteData[16], System.Globalization.NumberStyles.HexNumber).ToString() + "." + Int32.Parse(byteData[17], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //室内温度
+                retArray.Add(Int32.Parse(byteData[18], System.Globalization.NumberStyles.HexNumber).ToString() + "." + Int32.Parse(byteData[19], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //防冻功能
+                retArray.Add(Int32.Parse(byteData[23], System.Globalization.NumberStyles.HexNumber).ToString());
+
+                //键盘锁定
+                retArray.Add(Int32.Parse(byteData[25], System.Globalization.NumberStyles.HexNumber).ToString());
+            }
+
+            return retArray;
+        }
+
+        /// <summary>
+        /// 开关设备数据字节解析
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         private ArrayList ResolveIODeviceData(string data)
         {
             ArrayList retArray = new ArrayList();
@@ -533,7 +652,7 @@ namespace WebPlatform.Controllers
 
                 if (ioState.Length == 8)
                 {
-                    for(int i= 7;i>=0;i--)
+                    for (int i = 7; i >= 0; i--)
                     {
                         retArray.Add(ioState[i].ToString());
                     }
@@ -554,7 +673,7 @@ namespace WebPlatform.Controllers
 
             string[] byteData = data.Replace("0x", "@").Split("@".ToCharArray());
 
-            if(byteData.Length == 15)
+            if (byteData.Length == 15)
             {
                 retArray.Add(Int32.Parse(byteData[4] + byteData[5], System.Globalization.NumberStyles.HexNumber).ToString());
                 retArray.Add(Int32.Parse(byteData[6] + byteData[7], System.Globalization.NumberStyles.HexNumber).ToString());
@@ -573,7 +692,7 @@ namespace WebPlatform.Controllers
 
             Device_Info webCom = db.Device_Info.Find(dinfo.ParentID);
 
-            if(webCom.DevType == "COMPort")
+            if (webCom.DevType == "COMPort")
             {
                 serverUrl = webCom.PropertyJson;
             }

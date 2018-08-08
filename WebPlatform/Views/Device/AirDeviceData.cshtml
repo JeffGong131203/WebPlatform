@@ -43,12 +43,15 @@
         {
             System.Collections.ArrayList arr = (System.Collections.ArrayList)dataList[i];
 
-            dateList[i] = arr[0].ToString();
-            pm25List[i] = arr[1].ToString();
-            tmpList[i] = (Convert.ToDecimal(arr[2]) / 10).ToString();
-            wetList[i] = arr[3].ToString();
-            co2List[i] = arr[4].ToString();
-            tvocList[i] = arr[5].ToString();
+            if (arr.Count == 6)
+            {
+                dateList[i] = arr[0].ToString();
+                pm25List[i] = arr[1].ToString();
+                tmpList[i] = (Convert.ToDecimal(arr[2]) / 10).ToString();
+                wetList[i] = arr[3].ToString();
+                co2List[i] = arr[4].ToString();
+                tvocList[i] = arr[5].ToString();
+            }
         }
     }
     else
@@ -57,12 +60,15 @@
         {
             System.Collections.ArrayList arr = (System.Collections.ArrayList)dataList[i];
 
-            dateList[i] = arr[0].ToString();
-            pm25List[i] = arr[1].ToString();
-            tmpList[i] = (Convert.ToDecimal(arr[2]) / 10).ToString();
-            wetList[i] = arr[3].ToString();
-            co2List[i] = arr[4].ToString();
-            tvocList[i] = arr[5].ToString();
+            if (arr.Count == 6)
+            {
+                dateList[i] = arr[0].ToString();
+                pm25List[i] = arr[1].ToString();
+                tmpList[i] = (Convert.ToDecimal(arr[2]) / 10).ToString();
+                wetList[i] = arr[3].ToString();
+                co2List[i] = arr[4].ToString();
+                tvocList[i] = arr[5].ToString();
+            }
         }
     }
 
