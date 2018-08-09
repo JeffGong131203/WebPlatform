@@ -436,31 +436,31 @@ namespace WebPlatform.Controllers
         public ActionResult AirDeviceData(Guid devID)
         {
             string sendData = GetSendData(devID);
-            //Dictionary<string, string> dicRet = SendData(devID, sendData);
+            Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            //if (!dicRet.ContainsKey("ReciveData"))
-            //{
-            //    Thread.Sleep(500);
+            if (!dicRet.ContainsKey("ReciveData"))
+            {
+                Thread.Sleep(500);
 
-            //    dicRet = SendData(devID, sendData);
-            //}
+                dicRet = SendData(devID, sendData);
+            }
 
-            //ArrayList retArray = new ArrayList();
-            //if (dicRet.ContainsKey("ReciveData"))
-            //{
-            //    retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
-            //}
+            ArrayList retArray = new ArrayList();
+            if (dicRet.ContainsKey("ReciveData"))
+            {
+                retArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+            }
 
             ArrayList dataList = AirDeviceDataList(devID);
 
             ViewBag.DevID = devID;
 
-            ArrayList retArray = new ArrayList();
-            retArray.Add(((ArrayList)dataList[0])[1]);
-            retArray.Add(((ArrayList)dataList[0])[2]);
-            retArray.Add(((ArrayList)dataList[0])[3]);
-            retArray.Add(((ArrayList)dataList[0])[4]);
-            retArray.Add(((ArrayList)dataList[0])[5]);
+            //ArrayList retArray = new ArrayList();
+            //retArray.Add(((ArrayList)dataList[0])[1]);
+            //retArray.Add(((ArrayList)dataList[0])[2]);
+            //retArray.Add(((ArrayList)dataList[0])[3]);
+            //retArray.Add(((ArrayList)dataList[0])[4]);
+            //retArray.Add(((ArrayList)dataList[0])[5]);
 
             ViewBag.retArray = retArray;
             ViewBag.dataList = dataList;
@@ -560,30 +560,30 @@ namespace WebPlatform.Controllers
         public ActionResult PanelDeviceData(Guid devID)
         {
             string sendData = GetSendData(devID);
-            //Dictionary<string, string> dicRet = SendData(devID, sendData);
+            Dictionary<string, string> dicRet = SendData(devID, sendData);
 
-            //if (!dicRet.ContainsKey("ReciveData"))
-            //{
-            //    Thread.Sleep(500);
+            if (!dicRet.ContainsKey("ReciveData"))
+            {
+                Thread.Sleep(500);
 
-            //    dicRet = SendData(devID, sendData);
-            //}
+                dicRet = SendData(devID, sendData);
+            }
 
-            //ArrayList retArray = new ArrayList();
-            //if (dicRet.ContainsKey("ReciveData"))
-            //{
-            //    retArray = ResolvePanelDeviceData(dicRet["ReciveData"]);
-            //}
+            ArrayList retArray = new ArrayList();
+            if (dicRet.ContainsKey("ReciveData"))
+            {
+                retArray = ResolvePanelDeviceData(dicRet["ReciveData"]);
+            }
 
             ArrayList dataList = PanelDeviceDataList(devID);
 
             ViewBag.DevID = devID;
 
-            ArrayList retArray = new ArrayList();
-            for (int i = 1; i < ((ArrayList)dataList[0]).Count; i++)
-            {
-                retArray.Add(((ArrayList)dataList[0])[i]);
-            }
+            //ArrayList retArray = new ArrayList();
+            //for (int i = 1; i < ((ArrayList)dataList[0]).Count; i++)
+            //{
+            //    retArray.Add(((ArrayList)dataList[0])[i]);
+            //}
 
             ViewBag.retArray = retArray;
             ViewBag.dataList = dataList;

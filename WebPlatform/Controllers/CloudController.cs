@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -388,7 +389,7 @@ namespace WebPlatform.Controllers
             }
 
             //Create
-            if(serialNos.Count > 0 && ysMultiSetList.Count() == 0)
+            if (serialNos.Count > 0 && ysMultiSetList.Count() == 0)
             {
                 YSMultiSet ysm = new YSMultiSet();
                 ysm.ID = Guid.NewGuid();
@@ -400,7 +401,7 @@ namespace WebPlatform.Controllers
             }
 
             //Load Set
-            if(serialNos.Count == 0 && ysMultiSetList.Count() > 0)
+            if (serialNos.Count == 0 && ysMultiSetList.Count() > 0)
             {
                 serialNos = JsonConvert.DeserializeObject<Dictionary<int, string>>(ysMultiSetList.ToList()[0].YSMultiSetJson);
             }
@@ -438,9 +439,9 @@ namespace WebPlatform.Controllers
             Guid userid = GetUserID();
             IEnumerable<YSMultiSet> ysMultiSetList = db.YSMultiSet.Where(ysm => ysm.UserID == userid).ToList();
 
-            if (!reSet && ysMultiSetList.Count()>0)
+            if (!reSet && ysMultiSetList.Count() > 0)
             {
-                return RedirectToAction("YSLiveVideoMulti",new { ysm = ysMultiSetList.ToList()[0].YSMultiSetJson});
+                return RedirectToAction("YSLiveVideoMulti", new { ysm = ysMultiSetList.ToList()[0].YSMultiSetJson });
             }
 
             YsAPI ys;
@@ -574,9 +575,46 @@ namespace WebPlatform.Controllers
                 }
             }
 
-                ViewBag.retMsg = ret;
+            ViewBag.retMsg = ret;
 
-                return View("YSManage");
+            return View("YSManage");
+        }
+
+        private string[] DistinctAcctName(JArray devList)
+        {
+            ArrayList retArray = new ArrayList();
+
+            for (int i = 0; i < devList.Count(); i++)
+            {
+                string acctName = devList[i]["AccountName"].ToString();
+
+                if(!retArray.Contains(acctName))
+                {
+                    retArray.Add(acctName);
+                }
+            }
+
+            string[] ret = (string[])retArray.ToArray();
+
+            return ret;
+        }
+
+        private string[] DistinctDevList(JArray devList,string acctName)
+        {
+            ArrayList retArray = new ArrayList();
+
+            for (int i = 0; i < devList.Count(); i++)
+            {
+                if (devList[i]["AccountName"].ToString() == acctName)
+                {
+                    retArray.Add(devList[i]["DevList"].ToString());
+                }
+            }
+
+            string[] ret = (string[])retArray.ToArray();
+
+            return ret;
+
         }
     }
 }

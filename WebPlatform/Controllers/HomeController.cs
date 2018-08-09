@@ -50,10 +50,25 @@ namespace WebPlatform.Controllers
             }
 
             //本地设备
-            Guid userid = this.GetUserID();
-            IEnumerable<Device_User> devList = db.Device_User.Where(dev_u => dev_u.UserID == userid).ToList();
+            int localDevCount = 0;
 
-            ViewBag.devCount = devCount + devList.Count();
+            Guid userid = this.GetUserID();
+            IEnumerable<Portal_User_Customer> userCusList = db.Portal_User_Customer.Where(ucs => ucs.UserID == userid).ToList();
+
+            //某个客户下所有设备
+            if (userCusList.ToList().Count > 0)
+            {
+                for (int i = 0; i < userCusList.ToList().Count; i++)
+                {
+                    Guid cusid = userCusList.ToList()[i].CusID.Value;
+
+                    int devC = db.Device_Customer.Where(dev_u => dev_u.CustomerID == cusid).ToList().Count;
+
+                    localDevCount += devC;
+                }
+            }
+
+            ViewBag.devCount = devCount + localDevCount;
             ViewBag.onCount = onCount;
             ViewBag.offCount = offCount;
             ViewBag.errCount = errCount;
@@ -224,9 +239,24 @@ namespace WebPlatform.Controllers
             return Redirect("Login");
         }
 
-        public ActionResult Contact()
+        //public ActionResult Contact()
+        //{
+        //    ViewBag.Message = "Your contact page.";
+
+        //    return View();
+        //}
+
+
+        /// <summary>
+        /// 用户授权访问门店数据
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult MyStore()
         {
-            ViewBag.Message = "Your contact page.";
+            Guid userid = GetUserID();
+
+
 
             return View();
         }

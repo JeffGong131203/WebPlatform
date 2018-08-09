@@ -27,10 +27,11 @@ namespace WebPlatform.Models
         public DbSet<Portal_User> Portal_User { get; set; }
         public DbSet<Portal_User_Customer> Portal_User_Customer { get; set; }
         public DbSet<Device_Info> Device_Info { get; set; }
-        public DbSet<Device_User> Device_User { get; set; }
+        public DbSet<Device_Customer> Device_Customer { get; set; }
         public DbSet<YSMultiSet> YSMultiSet { get; set; }
         public DbSet<Device_Store> Device_Store { get; set; }
         public DbSet<Device_Send> Device_Send { get; set; }
+        public DbSet<Device_Customer_Store> Device_Customer_Store { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -45,10 +46,11 @@ namespace WebPlatform.Models
             modelBuilder.Configurations.Add(new Portal_UserMap());
             modelBuilder.Configurations.Add(new Portal_User_CustomerMap());
             modelBuilder.Configurations.Add(new Device_InfoMap());
-            modelBuilder.Configurations.Add(new Device_UserMap());
+            modelBuilder.Configurations.Add(new Device_CustomerMap());
             modelBuilder.Configurations.Add(new YSMultiSetMap());
             modelBuilder.Configurations.Add(new Device_StoreMap());
             modelBuilder.Configurations.Add(new Device_SendMap());
+            modelBuilder.Configurations.Add(new Device_Customer_StoreMap());
         }
     }
 }

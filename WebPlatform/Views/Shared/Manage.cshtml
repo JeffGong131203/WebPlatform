@@ -35,6 +35,7 @@
             <ul class="treeview-menu">
                 <li><a href="@Url.Action("YSAccountManage", "Cloud")"><i class="fa fa-circle-o text-aqua"></i> <span> 子账户管理</span></a></li>
                 <li><a href="@Url.Action("Index", "Cloud_YS_User")"><i class="fa fa-circle-o text-aqua"></i> <span> 子账户分配</span></a></li>
+                <li><a href="@Url.Action("YSManage", "Cloud")"><i class="fa fa-circle-o text-aqua"></i> <span> 批量设备管理</span></a></li>
 
             </ul>
         </li>
@@ -49,6 +50,7 @@
             <ul class="treeview-menu">
                 <li><a href="@Url.Action("List", "Device",new { DevType = "air" })"><i class="fa fa-circle-o text-aqua"></i> <span> 空气传感器</span></a></li>
                 <li><a href="@Url.Action("List", "Device", new { DevType = "io" })"><i class="fa fa-circle-o text-aqua"></i> <span> 开关设备</span></a></li>
+                <li><a href="@Url.Action("List", "Device", new { DevType = "panel" })"><i class="fa fa-circle-o text-aqua"></i> <span> 空调面板</span></a></li>
 
             </ul>
         </li>
