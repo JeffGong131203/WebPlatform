@@ -555,11 +555,15 @@ namespace WebPlatform.Controllers
 
                 JArray dev = Newtonsoft.Json.Linq.JArray.Parse(devList);
 
-                for (int i = 0; i < dev.Count(); i++)
-                {
-                    string acctName = dev[i]["AccountName"].ToString();
+                string[] acctNameList = DistinctAcctName(dev);
 
-                    string[] subDevList = dev[i]["DevList"].ToString().Split(",".ToCharArray());
+                Dictionary<string, string> dicSubAcct = new Dictionary<string, string>();
+
+                for (int i = 0; i < acctNameList.Count(); i++)
+                {
+                    string acctName = acctNameList[i].ToString();
+
+                    string[] subDevList = DistinctDevList(dev, acctName);
 
                     string accountID = ys.addSubAccount(acctName, acctName);
                     if (!string.IsNullOrEmpty(accountID))
@@ -572,7 +576,52 @@ namespace WebPlatform.Controllers
 
                         ret += ys.SetSubAccountPolicy(accountID, new string[] { }, subDevList);
                     }
+
+                    dicSubAcct.Add(acctName, accountID);
                 }
+
+                //平台帐号批处理
+                foreach (KeyValuePair<string, string> kvp in dicSubAcct)
+                {
+                    string loginno = kvp.Key;
+                    string accountID = kvp.Value;
+                    Guid userid = Guid.Empty;
+
+                    IEnumerable<Portal_User> userList = db.Portal_User.Where(u => u.Loginno == loginno);
+
+                    //已有帐号
+                    if (userList.ToList().Count > 0)
+                    {
+                        userid = userList.ToList()[0].ID;
+                    }
+                    else//新建帐号
+                    {
+                        Portal_User user_info = new Portal_User();
+                        user_info.ID = Guid.NewGuid();
+                        user_info.Loginno = loginno;
+                        user_info.Loginpsw = loginno;
+                        user_info.IsUsed = true;
+
+                        db.Portal_User.Add(user_info);
+
+                        userid = user_info.ID;
+                    }
+
+                    //Cloud_YS_User
+                    IEnumerable<Cloud_YS_User> ysUserList = db.Cloud_YS_User.Where(ysu => ysu.UserID == userid);
+
+                    if(ysUserList.ToList().Count == 0)
+                    {
+                        Cloud_YS_User ysInfo = new Cloud_YS_User();
+                        ysInfo.ID = Guid.NewGuid();
+                        ysInfo.UserID = userid;
+                        ysInfo.YsAccount = accountID;
+
+                        db.Cloud_YS_User.Add(ysInfo);
+                    }
+                }
+
+                db.SaveChanges();
             }
 
             ViewBag.retMsg = ret;
@@ -588,18 +637,18 @@ namespace WebPlatform.Controllers
             {
                 string acctName = devList[i]["AccountName"].ToString();
 
-                if(!retArray.Contains(acctName))
+                if (!retArray.Contains(acctName))
                 {
                     retArray.Add(acctName);
                 }
             }
 
-            string[] ret = (string[])retArray.ToArray();
+            string[] ret = (string[])retArray.ToArray(typeof(string));
 
             return ret;
         }
 
-        private string[] DistinctDevList(JArray devList,string acctName)
+        private string[] DistinctDevList(JArray devList, string acctName)
         {
             ArrayList retArray = new ArrayList();
 
@@ -611,7 +660,7 @@ namespace WebPlatform.Controllers
                 }
             }
 
-            string[] ret = (string[])retArray.ToArray();
+            string[] ret = (string[])retArray.ToArray(typeof(string));
 
             return ret;
 

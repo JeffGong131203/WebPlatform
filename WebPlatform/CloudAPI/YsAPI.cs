@@ -63,6 +63,8 @@ namespace WebPlatform.CloudAPI
             else //API Error,Write Log
             {
                 APIError(url, parameters, jStr);
+
+                retStr = jStr.ToString();
             }
 
             //获取子账号AccessToken
@@ -83,6 +85,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    retStr = jStr.ToString();
                 }
             }
 
@@ -120,6 +124,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    retStr = jStr.ToString();
                 }
             }
 
@@ -201,6 +207,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    retMsg = jStr.ToString();
                 }
             }
 
@@ -234,6 +242,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    retStr = jStr.ToString();
                 }
             }
 
@@ -281,6 +291,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    retStr = jStr.ToString();
                 }
             }
 
@@ -462,6 +474,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    ret = jStr.ToString();
                 }
             }
 
@@ -498,6 +512,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    ret = jStr.ToString();
                 }
             }
 
@@ -530,6 +546,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    ret = jStr.ToString();
                 }
             }
 
@@ -566,6 +584,8 @@ namespace WebPlatform.CloudAPI
                 else //API Error,Write Log
                 {
                     APIError(url, parameters, jStr);
+
+                    ret = jStr.ToString();
                 }
             }
 
