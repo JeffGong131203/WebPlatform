@@ -1,0 +1,38 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "DeviceData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Guid devID = ViewBag.devID;
+    string devType = ViewBag.devType;
+
+    string dataAction = string.Empty;
+
+    switch (devType.ToLower())
+    {
+        case "air":
+            dataAction = "AirDeviceData";
+            break;
+        case "io":
+            dataAction = "IODeviceData";
+            break;
+        case "panel":
+            dataAction = "PanelDeviceData";
+            break;
+    }
+}
+
+<h1>
+    设备数据查看
+</h1>
+<div class="row">
+    <div class="col-sm-1">
+        <a href="@Url.Action("List","Device",new { DevType = devType})"><button type="button" class="btn btn-block btn-info">返回</button></a>
+    </div>
+</div>
+<br />
+<br />
+
+@Html.Action(dataAction, new { devID = devID })

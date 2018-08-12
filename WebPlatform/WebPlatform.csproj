@@ -7476,6 +7476,10 @@
     <Content Include="Views\Device\List.cshtml" />
     <Content Include="Views\Device\DevCusName.cshtml" />
     <Content Include="Views\Device\PanelDeviceData.cshtml" />
+    <Content Include="Views\Home\MyStore.cshtml" />
+    <Content Include="Views\Home\StoreDeviceSet.cshtml" />
+    <Content Include="Views\Home\DeviceDataView.cshtml" />
+    <Content Include="Views\Device\DeviceData.cshtml" />
     <None Include="Web References\WebComSvc\SerialPort.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

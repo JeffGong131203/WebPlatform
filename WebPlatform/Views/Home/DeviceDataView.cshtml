@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewBag.Title = "DeviceDataView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
+
+    IEnumerable<WebPlatform.Models.Device_Info> devList = ViewBag.devList;
+    Guid storeID = ViewBag.storeID;
+    Guid cusID = ViewBag.cusID;
+
+    WebPlatform.Models.Portal_Customer_Store storeInfo = db.Portal_Customer_Store.Find(storeID);
+}
+
+<h2>@storeInfo.StoreName</h2>
+
+<div class="row">
+    <div class="col-sm-1">
+        <a href="@Url.Action("MyStore","Home")"><button type="button" class="btn btn-block btn-info">返回</button></a>
+    </div>
+</div>
+
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">空气传感器</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+        </div>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="row">
+            @foreach (WebPlatform.Models.Device_Info dev in devList)
+            {
+                if (dev.DevType == "Air")
+                {
+                    <div class="col-md-12">
+                        @Html.Action("AirDeviceData", "Device", new { devID = dev.ID, devType = dev.DevType })
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">空调面板</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+        </div>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="row">
+            @foreach (WebPlatform.Models.Device_Info dev in devList)
+            {
+                if (dev.DevType == "Panel")
+                {
+                    <div class="col-md-12">
+                        @Html.Action("PanelDeviceData", "Device", new { devID = dev.ID, devType = dev.DevType })
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="box box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">8路开关</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+        </div>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="row">
+            @foreach (WebPlatform.Models.Device_Info dev in devList)
+            {
+                if (dev.DevType == "IO")
+                {
+                    <div class="col-md-12">
+                        @Html.Action("IODeviceData", "Device", new { devID = dev.ID, devType = dev.DevType })
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

@@ -140,7 +140,7 @@ namespace WebPlatform.Controllers
             string newpsw1 = Request.Form["newpsw1"];
             string newpsw2 = Request.Form["newpsw2"];
 
-            if(newpsw1 != newpsw2)
+            if (newpsw1 != newpsw2)
             {
                 ViewBag.errMsg = "两次密码输入不一致";
             }
@@ -148,7 +148,7 @@ namespace WebPlatform.Controllers
             {
                 IEnumerable<Portal_User> userList = db.Portal_User.Where(userid => userid.ID == uid && userid.Loginpsw == oldpsw).ToList();
 
-                if(userList.Count()>0)
+                if (userList.Count() > 0)
                 {
                     Portal_User uInfo = userList.ToList()[0];
 
@@ -256,7 +256,114 @@ namespace WebPlatform.Controllers
         {
             Guid userid = GetUserID();
 
+            Guid?[] storeIDArray = db.Portal_User_Customer.Where(u => u.UserID == userid).Select(u => u.StoreID).ToArray();
+            Guid?[] cusIDArray = db.Portal_User_Customer.Where(u => u.UserID == userid).Select(u => u.CusID).ToArray();
 
+            IEnumerable<Portal_Customer_Store> storeList = db.Portal_Customer_Store.Where(s => storeIDArray.Contains(s.ID));
+
+            ViewBag.storeList = storeList;
+
+            if (cusIDArray.Count() > 0)
+            {
+                ViewBag.cusID = cusIDArray[0].Value;
+            }
+            else
+            {
+                ViewBag.cusID = Guid.Empty;
+            }
+
+            return View();
+        }
+
+        /// <summary>
+        /// 门店设备管理（设备分组，归属到门店）
+        /// </summary>
+        /// <param name="storeID"></param>
+        /// <param name="cusID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult StoreDeviceSet(Guid storeID, Guid cusID)
+        {
+            //该客户下门店所有可用设备，排除所有已分配
+            Guid?[] devIDArrayIn = db.Device_Customer_Store.Where(d => d.CusID == cusID).Select(d => d.DeviceID).ToArray();
+            Guid?[] devIDArrayOut = db.Device_Customer.Where(d => d.CustomerID == cusID && !devIDArrayIn.Contains(d.DeviceID)).Select(d => d.DeviceID).ToArray();
+            //该门店已分配设备
+            Guid?[] devIDArrayStore = db.Device_Customer_Store.Where(d => d.CusID == cusID && d.StoreID == storeID).Select(d => d.DeviceID).ToArray();
+
+            //可分配设备清单
+            IEnumerable<Device_Info> devOutList = db.Device_Info.Where(d => devIDArrayOut.Contains(d.ID)).OrderBy(d => d.DevType).OrderBy(d => d.DevCode);
+
+            //已分配设备清单
+            IEnumerable<Device_Info> devInList = db.Device_Info.Where(d => devIDArrayStore.Contains(d.ID)).OrderBy(d => d.DevType).OrderBy(d => d.DevCode);
+
+            Portal_Customer_Store storeInfo = db.Portal_Customer_Store.Find(storeID);
+
+            ViewBag.devOutList = devOutList;
+            ViewBag.devInList = devInList;
+            ViewBag.storeID = storeID;
+            ViewBag.areaID = storeInfo.AreaID;
+            ViewBag.cusID = cusID;
+
+            return View();
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult StoreDeviceSet(Guid storeID, Guid areaID, Guid cusID)
+        {
+            List<Guid> devIDArray = new List<Guid>();
+
+            foreach (string key in Request.Form.Keys)
+            {
+                if (key.Contains("Sel"))
+                {
+                    string[] devIDStrArray = Request.Form[key].Split(",".ToCharArray());
+
+                    foreach(string devStr in devIDStrArray)
+                    {
+                        devIDArray.Add(new Guid(devStr));
+                    }
+                }
+            }
+
+            foreach (Guid devID in devIDArray)
+            {
+                Device_Customer_Store dcs = new Device_Customer_Store();
+                dcs.ID = Guid.NewGuid();
+                dcs.DeviceID = devID;
+                dcs.StoreID = storeID;
+                dcs.AreaID = areaID;
+                dcs.CusID = cusID;
+
+                db.Device_Customer_Store.Add(dcs);
+            }
+
+            db.SaveChanges();
+
+            return RedirectToAction("StoreDeviceSet", new { storeID = storeID, cusID = cusID });
+        }
+
+
+        [Authorize]
+        public ActionResult DeleteStoreDevice(Guid devID, Guid storeID, Guid cusID)
+        {
+            Device_Customer_Store device_Info = db.Device_Customer_Store.First(d => d.DeviceID == devID);
+            db.Device_Customer_Store.Remove(device_Info);
+            db.SaveChanges();
+
+            return RedirectToAction("StoreDeviceSet", new { storeID = storeID, cusID = cusID });
+        }
+
+        [Authorize]
+        public ActionResult DeviceDataView(Guid storeID, Guid cusID)
+        {
+            Guid?[] devIDArray = db.Device_Customer_Store.Where(d => d.StoreID == storeID).Select(d => d.DeviceID).ToArray();
+            IEnumerable<Device_Info> devList = db.Device_Info.Where(d => devIDArray.Contains(d.ID)).OrderBy(d => d.DevType).OrderBy(d => d.DevCode);
+
+            ViewBag.devList = devList;
+            ViewBag.storeID = storeID;
+            ViewBag.cusID = cusID;
 
             return View();
         }

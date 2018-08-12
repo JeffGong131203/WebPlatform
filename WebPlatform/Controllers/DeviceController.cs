@@ -57,17 +57,22 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult DeviceData(Guid id, string devType)
         {
-            switch (devType.ToLower())
-            {
-                case "air":
-                    return RedirectToAction("AirDeviceData", new { devID = id });
-                case "io":
-                    return RedirectToAction("IODeviceData", new { devID = id });
-                case "panel":
-                    return RedirectToAction("PanelDeviceData", new { devID = id }); ;
-                default:
-                    return RedirectToAction("List", new { devType = devType });
-            }
+            //switch (devType.ToLower())
+            //{
+            //    case "air":
+            //        return RedirectToAction("AirDeviceData", new { devID = id });
+            //    case "io":
+            //        return RedirectToAction("IODeviceData", new { devID = id });
+            //    case "panel":
+            //        return RedirectToAction("PanelDeviceData", new { devID = id }); ;
+            //    default:
+            //        return RedirectToAction("List", new { devType = devType });
+            //}
+
+            ViewBag.devID = id;
+            ViewBag.devType = devType;
+
+            return View();
         }
 
         // GET: Device/Details/5
@@ -520,6 +525,26 @@ namespace WebPlatform.Controllers
             if (!string.IsNullOrEmpty(retData))
             {
                 dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
+
+                t1 = DateTime.Now;
+                while(string.IsNullOrEmpty(dicRet["ReciveData"].ToString()))
+                {
+                    retData = spd.GetReciveData();
+
+                    Thread.Sleep(200);
+
+                    t2 = DateTime.Now;
+                    ts = t2 - t1;
+                    if (ts.TotalSeconds > 5)
+                    {
+                        break;
+                    }
+                }
+
+                if(!string.IsNullOrEmpty(retData))
+                {
+                    dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
+                }
             }
 
             return dicRet;

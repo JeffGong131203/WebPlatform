@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "空调面板";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 
     string[] statusName = new string[] { "关", "开", "防冻启动" };
     string[] modeName = new string[] { "","制冷","制热","通风"};
@@ -20,7 +20,7 @@
 
     //实时数据处理
     string setTmp = string.Empty;
-    string tmp = string.Empty;
+    string panelTmp = string.Empty;
     string statusCode = string.Empty;
     string modeCode = string.Empty;
     string fanModeCode = string.Empty;
@@ -31,7 +31,7 @@
         modeCode = retArray[1].ToString();
         setTmp = retArray[2].ToString();
         fanModeCode = retArray[3].ToString();
-        tmp = retArray[6].ToString();
+        panelTmp = retArray[6].ToString();
     }
 
     //图表数据处理
@@ -65,21 +65,21 @@
         }
     }
 
-    string dateJson = Newtonsoft.Json.JsonConvert.SerializeObject(dateList, Newtonsoft.Json.Formatting.Indented);
-    string tmpJson = Newtonsoft.Json.JsonConvert.SerializeObject(tmpList, Newtonsoft.Json.Formatting.Indented);
+    string panelDateJson = Newtonsoft.Json.JsonConvert.SerializeObject(dateList, Newtonsoft.Json.Formatting.Indented);
+    string panelTmpJson = Newtonsoft.Json.JsonConvert.SerializeObject(tmpList, Newtonsoft.Json.Formatting.Indented);
 }
 
 <h1>
     空调面板
     <small>@devDic["DevCusName"]</small>
 </h1>
-<div class="row">
+@*<div class="row">
     <div class="col-sm-1">
         <a href="@Url.Action("List","Device",new { DevType = "panel"})"><button type="button" class="btn btn-block btn-info">返回</button></a>
     </div>
 </div>
 <br />
-<br />
+<br />*@
 <!-- Small boxes (Stat box) -->
 <div class="row">
     <div class="col-lg-3 col-xs-6">
@@ -100,7 +100,7 @@
         <!-- small box -->
         <div class="small-box bg-green">
             <div class="inner">
-                <h3>@tmp</h3>
+                <h3>@panelTmp</h3>
                 <p>室内温度</p>
             </div>
             <div class="icon">
@@ -171,7 +171,7 @@
             </div>
             <div class="box-body">
                 <div class="chart">
-                    <canvas id="tmpChart" style="height:500px"></canvas>
+                    <canvas id="panelTmpChart" style="height:500px"></canvas>
                 </div>
             </div>
             <!-- /.box-body -->
@@ -185,7 +185,7 @@
         //- Line CHART 温度 -
         //-------------------
 
-        var co2TvocAreaChartOptions = {
+        var panelAreaChartOptions = {
             //Boolean - If we should show the scale at all
             showScale: true,
             //Boolean - Whether grid lines are shown across the chart
@@ -224,8 +224,8 @@
             responsive: true
         }
 
-        var tmpChartData = {
-            labels: @Html.Raw(dateJson),
+        var panelTmpChartData = {
+            labels: @Html.Raw(panelDateJson),
             datasets: [
                 {
                     label: '温度',
@@ -235,16 +235,16 @@
                     pointStrokeColor: '#c1c7d1',
                     pointHighlightFill: '#fff',
                     pointHighlightStroke: 'rgba(220,220,220,1)',
-                    data: @Html.Raw(tmpJson)
+                    data: @Html.Raw(panelTmpJson)
                 }
             ]
         }
 
 
-        var tmpChartCanvas = $('#tmpChart').get(0).getContext('2d')
-        var tmpChart = new Chart(tmpChartCanvas)
-        var tmpChartOptions = co2TvocAreaChartOptions
-        tmpChartOptions.datasetFill = false
-        tmpChart.Line(tmpChartData, tmpChartOptions)
+        var panelTmpChartCanvas = $('#panelTmpChart').get(0).getContext('2d')
+        var panelTmpChart = new Chart(panelTmpChartCanvas)
+        var panelTmpChartOptions = panelAreaChartOptions
+        panelTmpChartOptions.datasetFill = false
+        panelTmpChart.Line(panelTmpChartData, panelTmpChartOptions)
     })    
 </script>

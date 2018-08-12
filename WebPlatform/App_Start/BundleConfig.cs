@@ -29,6 +29,7 @@ namespace WebPlatform
                       "~/AdminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js",
                       "~/AdminLTE/bower_components/Chart.js/Chart.js",
                       "~/AdminLTE/bower_components/fastclick/lib/fastclick.js",
+                      "~/AdminLTE/bower_components/select2/dist/js/select2.full.min.js",
                       "~/AdminLTE/dist/js/adminlte.min.js",
                       "~/AdminLTE/dist/js/demo.js"));
 
@@ -38,6 +39,7 @@ namespace WebPlatform
             bundles.Add(new StyleBundle("~/AdminLTE/css").Include(
                       "~/AdminLTE/bower_components/font-awesome/css/font-awesome.min.css",
                       "~/AdminLTE/bower_components/Ionicons/css/ionicons.min.css",
+                      "~/AdminLTE/bower_components/select2/dist/css/select2.min.css",
                       "~/AdminLTE/dist/css/AdminLTE.min.css",
                       "~/AdminLTE/dist/css/skins/_all-skins.min.css",
                       "~/AdminLTE/bower_components/Switch/bootstrapSwitch.css"));

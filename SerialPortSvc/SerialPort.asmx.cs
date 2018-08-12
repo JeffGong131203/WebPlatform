@@ -39,7 +39,7 @@ namespace SerialPortSvc
             List<string> comList = GetComlist(false); //首先获取本机关联的串行端口列表            
             if (comList.Count == 0)
             {
-                throw new Exception("当前设备不存在串行端口！");
+                throw new Exception("No COMPort found!");
                 //System.Environment.Exit(0); //彻底退出应用程序   
             }
             else
@@ -49,7 +49,7 @@ namespace SerialPortSvc
                 //判断串口列表中是否存在目标串行端口
                 if (!comList.Contains(targetCOMPort))
                 {
-                    throw new Exception("当前设备不存在配置的串行端口！");
+                    throw new Exception("No COMPort found!");
                     //System.Environment.Exit(0); //彻底退出应用程序   
                 }
 
@@ -88,7 +88,7 @@ namespace SerialPortSvc
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("串行端口打开失败！具体原因：" + ex.Message);
+                    throw new Exception("Open COMPort error: " + ex.Message);
                     //System.Environment.Exit(0); //彻底退出应用程序   
 
                 }
@@ -135,7 +135,7 @@ namespace SerialPortSvc
                 }
                 else
                 {
-                    throw new Exception("当前设备串行端口未打开！");
+                    throw new Exception("COMPort is not open");
                 }
             }
             catch (Exception ex)
@@ -184,13 +184,17 @@ namespace SerialPortSvc
             }
             catch (Exception ex)
             {
-                throw new Exception("接收返回消息异常！具体原因：" + ex.Message);
+                throw new Exception("Recive data error: " + ex.Message);
             }
         }
 
         private void ProcessData(string strData)
         {
             _reciveData = string.Empty;
+
+            //返回值与指令校验
+            string[] sendDataArray = _sendData.Split(" ".ToCharArray());
+            string[] reciveDataArray = strData.Split("0x".ToCharArray());
 
             Dictionary<string, string> retData = new Dictionary<string, string>();
             retData.Add("DeviceID", _deviceID);
@@ -199,7 +203,13 @@ namespace SerialPortSvc
             retData.Add("ReciveTime", DateTime.Now.ToString());
             retData.Add("ReciveData", strData);
 
-            _reciveData = JsonConvert.SerializeObject(retData, Formatting.Indented); 
+            _reciveData = JsonConvert.SerializeObject(retData, Formatting.Indented);
+
+            if (sendDataArray[0] != reciveDataArray[1])
+            {
+                retData.Add("ErrorData", sendDataArray[0] + ":" + reciveDataArray[1]);
+            }
+
         }
 
         private static byte[] HexStringToByteArray(string s)
@@ -208,7 +218,7 @@ namespace SerialPortSvc
             {
                 if (s.Length == 0)
                 {
-                    throw new Exception("将16进制字符串转换成字节数组时出错，错误信息：被转换的字符串长度为0。");
+                    throw new Exception("Hex convert error");
                 }
 
                 s = s.Replace(" ", "");
@@ -223,7 +233,7 @@ namespace SerialPortSvc
             }
             catch (Exception ex)
             {
-                throw new Exception("将16进制字符串转换成字节数组时出错！具体原因：" + ex.Message);
+                throw new Exception("Hex array convert error:" + ex.Message);
             }
         }
 
@@ -269,7 +279,7 @@ namespace SerialPortSvc
             }
             catch
             {
-                throw new Exception("串行端口检查异常！");
+                throw new Exception("Get COMPort list error");
                 //System.Environment.Exit(0); //彻底退出应用程序   
             }
             return list;

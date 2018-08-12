@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewBag.Title = "开关设备";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 
     Guid devID = ViewBag.DevID;
     System.Collections.ArrayList retArray = ViewBag.retArray;
@@ -20,13 +20,13 @@
     8路开关
     <small>@devDic["DevCusName"]</small>
 </h1>
-<div class="row">
+@*<div class="row">
     <div class="col-sm-1">
         <a href="@Url.Action("List","Device",new { DevType = "io"})"><button type="button" class="btn btn-block btn-info">返回</button></a>
     </div>
 </div>
 <br />
-<br />
+<br />*@
 <!-- Small boxes (Stat box) -->
 <div class="row">
     @for (int i = 0; i < retArray.Count; i++)

@@ -1,0 +1,140 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "设备分组";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    IEnumerable<WebPlatform.Models.Device_Info> devOutList = ViewBag.devOutList;
+    IEnumerable<WebPlatform.Models.Device_Info> devInList = ViewBag.devInList;
+    Guid storeID = ViewBag.storeID;
+    Guid areaID = ViewBag.areaID;
+    Guid cusID = ViewBag.cusID;
+
+    Dictionary<string, string> devTypeDic = new Dictionary<string, string>();
+    devTypeDic.Add("Air", "空气传感器");
+    devTypeDic.Add("IO", "8路开关");
+    devTypeDic.Add("Panel", "风机面板");
+
+}
+
+<h3>已分组设备</h3>
+
+<table class="table">
+    <tr>
+        <th>
+            设备名称
+        </th>
+        <th>
+            别名
+        </th>
+        <th>
+            设备类型
+        </th>
+        <th>
+
+        </th>
+    </tr>
+
+    @foreach (WebPlatform.Models.Device_Info d in devInList.ToList())
+    {
+        <tr>
+            <td>
+                @d.DevName
+            </td>
+            <td>
+                @(Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(d.PropertyJson)["DevCusName"])
+            </td>
+            <td>
+                @devTypeDic[d.DevType]
+            </td>
+            <td>
+                @Html.ActionLink("移除", "DeleteStoreDevice", new { devID = d.ID, storeID = storeID, cusID = cusID })
+            </td>
+        </tr>
+    }
+</table>
+
+
+@using (Html.BeginForm("StoreDeviceSet", "Home", new { storeID = storeID, areaID = areaID, cusID = cusID }, FormMethod.Post))
+{
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">可添加设备</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>空气传感器</label>
+                        <select name="airSel" class="form-control select2 select2-hidden-accessible" multiple="" data-placeholder="请选择设备" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                            @foreach (WebPlatform.Models.Device_Info d in devOutList.ToList())
+                            {
+                                if (d.DevType == "Air")
+                                {
+                                    <option value="@d.ID">@d.DevName (@(Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(d.PropertyJson)["DevCusName"]))</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>8路开关</label>
+                        <select name="ioSel" class="form-control select2 select2-hidden-accessible" multiple="" data-placeholder="请选择设备" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                            @foreach (WebPlatform.Models.Device_Info d in devOutList.ToList())
+                            {
+                                if (d.DevType == "IO")
+                                {
+                                    <option value="@d.ID">@d.DevName (@(Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(d.PropertyJson)["DevCusName"]))</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>风机面板</label>
+                        <select name="panelSel" class="form-control select2 select2-hidden-accessible" multiple="" data-placeholder="请选择设备" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                            @foreach (WebPlatform.Models.Device_Info d in devOutList.ToList())
+                            {
+                                if (d.DevType == "Panel")
+                                {
+                                    <option value="@d.ID">@d.DevName (@(Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(d.PropertyJson)["DevCusName"]))</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+        @*<div class="box-footer">
+                Visit <a href="https://select2.github.io/">Select2 documentation</a> for more examples and information about
+                the plugin.
+            </div>*@
+    </div>
+    <div class="row">
+        <div class="col-sm-1">
+            <button type="submit" class="btn btn-block btn-info">确定</button>
+        </div>
+        <div class="col-sm-1">
+            <a href="@Url.Action("MyStore","Home")"><button type="button" class="btn btn-block btn-info">返回</button></a>
+        </div>
+    </div>
+}
+
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2()
+    })</script>
+
