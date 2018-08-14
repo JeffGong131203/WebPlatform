@@ -402,7 +402,7 @@ namespace WebPlatform.Controllers
 
             SendData(devID, sendData);
 
-            return RedirectToAction("IODeviceData", new { devID = devID });
+            return RedirectToAction("DeviceData", new { ID = devID,devType="IO" });
         }
 
 
