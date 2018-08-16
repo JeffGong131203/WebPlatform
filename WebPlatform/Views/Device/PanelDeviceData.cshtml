@@ -1,11 +1,13 @@
 ﻿
 @{
+    /**/
+
     ViewBag.Title = "空调面板";
     Layout = null;
 
     string[] statusName = new string[] { "关", "开", "防冻启动" };
-    string[] modeName = new string[] { "","制冷","制热","通风"};
-    string[] fanModeName = new string[] { "自动","高速","中速","低速"};
+    string[] modeName = new string[] { "", "制冷", "制热", "通风" };
+    string[] fanModeName = new string[] { "自动", "高速", "中速", "低速" };
 
 
     Guid devID = ViewBag.DevID;
@@ -74,12 +76,12 @@
     <small>@devDic["DevCusName"]</small>
 </h1>
 @*<div class="row">
-    <div class="col-sm-1">
-        <a href="@Url.Action("List","Device",new { DevType = "panel"})"><button type="button" class="btn btn-block btn-info">返回</button></a>
+        <div class="col-sm-1">
+            <a href="@Url.Action("List","Device",new { DevType = "panel"})"><button type="button" class="btn btn-block btn-info">返回</button></a>
+        </div>
     </div>
-</div>
-<br />
-<br />*@
+    <br />
+    <br />*@
 <!-- Small boxes (Stat box) -->
 <div class="row">
     <div class="col-lg-3 col-xs-6">
@@ -154,6 +156,135 @@
     </div>
     <!-- ./col -->
 </div>
+
+@using (Html.BeginForm("PanelDeviceSet", "Device", new { devID = devID }))
+{
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">设备控制</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>状态</h3>
+                            <p>
+                                <select name="SEL_Status" class="form-control select2" style="width:200px">
+                                    @for (int i = 0; i < statusName.Length; i++)
+                                    {
+                                        if (int.Parse(statusCode) == i)
+                                        {
+                                            <option value="@i" selected="selected">@statusName[i]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@i">@statusName[i]</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-open"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>模式</h3>
+                            <p>
+                                <select name="SEL_Mode" class="form-control select2" style="width:200px">
+                                    @for (int i = 0; i < modeName.Length; i++)
+                                    {
+                                        if (int.Parse(modeCode) == i)
+                                        {
+                                            <option value="@i" selected="selected">@modeName[i]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@i">@modeName[i]</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-star"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>风机模式</h3>
+                            <p>
+                                <select name="SEL_FanMode" class="form-control select2" style="width:200px">
+                                    @for (int i = 0; i < fanModeName.Length; i++)
+                                    {
+                                        if (int.Parse(fanModeCode) == i)
+                                        {
+                                            <option value="@i" selected="selected">@fanModeName[i]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@i">@fanModeName[i]</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-star"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>设置温度</h3>
+                            <p>
+                                <select name="SEL_SetTmp" class="form-control select2" style="width:200px">
+                                    @for (int i = 16; i <= 30; i++)
+                                    {
+                                        if (Convert.ToInt32(decimal.Parse(panelTmp)) == i)
+                                        {
+                                            <option value="@i" selected="selected">@i</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@i">@i</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-star"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-1">
+                    <button type="submit" class="btn btn-block btn-info">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
 
 
 <div class="row">
@@ -246,5 +377,5 @@
         var panelTmpChartOptions = panelAreaChartOptions
         panelTmpChartOptions.datasetFill = false
         panelTmpChart.Line(panelTmpChartData, panelTmpChartOptions)
-    })    
+    })
 </script>

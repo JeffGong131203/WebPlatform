@@ -402,9 +402,22 @@ namespace WebPlatform.Controllers
 
             SendData(devID, sendData);
 
-            return RedirectToAction("DeviceData", new { ID = devID,devType="IO" });
+            return RedirectToAction("DeviceData", new { ID = devID, devType = "IO" });
         }
 
+        private IEnumerable GetDeviceDataList(Guid devID)
+        {
+            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID && dev.SendData.Substring(0, 2).ToUpper().Trim() == dev.ReciveData.Substring(2, 2).ToUpper().Trim()).OrderByDescending(dev => dev.SendTime).Take(50).ToList();
+
+            return devDataList;
+        }
+
+        private IEnumerable GetDeviceDataList(Guid devID,int rowCount)
+        {
+            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID && dev.SendData.Substring(0, 2).ToUpper().Trim() == dev.ReciveData.Substring(2, 2).ToUpper().Trim()).OrderByDescending(dev => dev.SendTime).Take(rowCount).ToList();
+
+            return devDataList;
+        }
 
         /// <summary>
         /// 
@@ -415,7 +428,7 @@ namespace WebPlatform.Controllers
         {
             ArrayList airDataList = new ArrayList();
 
-            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID).OrderByDescending(dev => dev.SendTime).Take(50).ToList();
+            IEnumerable devDataList = GetDeviceDataList(devID);
 
             foreach (Device_Data ddata in devDataList)
             {
@@ -527,7 +540,7 @@ namespace WebPlatform.Controllers
                 dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
 
                 t1 = DateTime.Now;
-                while(string.IsNullOrEmpty(dicRet["ReciveData"].ToString()))
+                while (string.IsNullOrEmpty(dicRet["ReciveData"].ToString()))
                 {
                     retData = spd.GetReciveData();
 
@@ -541,7 +554,7 @@ namespace WebPlatform.Controllers
                     }
                 }
 
-                if(!string.IsNullOrEmpty(retData))
+                if (!string.IsNullOrEmpty(retData))
                 {
                     dicRet = JsonConvert.DeserializeObject<Dictionary<string, string>>(retData);
                 }
@@ -559,13 +572,13 @@ namespace WebPlatform.Controllers
         {
             ArrayList panelDataList = new ArrayList();
 
-            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID).OrderByDescending(dev => dev.SendTime).Take(50).ToList();
+            IEnumerable devDataList = GetDeviceDataList(devID);
 
             foreach (Device_Data ddata in devDataList)
             {
                 ArrayList retArray = ResolvePanelDeviceData(ddata.ReciveData);
 
-                if (retArray.Count > 5)
+                if (retArray.Count == 9)
                 {
                     retArray.Insert(0, ddata.SendTime.ToShortTimeString());
 
@@ -574,6 +587,57 @@ namespace WebPlatform.Controllers
             }
 
             return panelDataList;
+        }
+
+        /// <summary>
+        /// 面板控制
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <param name="setCode"></param>
+        /// <param name="setValue"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult PanelDeviceSet(Guid devID)
+        {
+            Device_Info device_Info = db.Device_Info.Find(devID);
+            if (device_Info == null)
+            {
+                return HttpNotFound();
+            }
+
+            string statusCode = string.Empty;
+            string modeCode = string.Empty;
+            string fanModeCode = string.Empty;
+            string setTmp = string.Empty;
+
+            if(Request.Form["SEL_Status"] != null)
+            {
+                statusCode = Request.Form["SEL_Status"];
+            }
+
+            if (Request.Form["SEL_Mode"] != null)
+            {
+                modeCode = Request.Form["SEL_Mode"];
+            }
+
+            if (Request.Form["SEL_FanMode"] != null)
+            {
+                fanModeCode = Request.Form["SEL_FanMode"];
+            }
+
+            if (Request.Form["SEL_SetTmp"] != null)
+            {
+                setTmp = Request.Form["SEL_SetTmp"];
+            }
+
+            //string sendData = string.Empty;
+            //string addCode = JsonConvert.DeserializeObject<Dictionary<string, string>>(device_Info.PropertyJson)["addCode"];
+
+            //sendData = BLL.BLLHelper.CRC_16(addCode + "03" + setCode + setValue);
+
+            //SendData(devID, sendData);
+
+            return RedirectToAction("DeviceData", new { ID = devID, devType = "Panel" });
         }
 
         /// <summary>
