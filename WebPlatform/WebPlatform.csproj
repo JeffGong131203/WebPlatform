@@ -213,6 +213,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Cinema_SellInfo.cs" />
     <Compile Include="Models\Cloud_YS_User.cs" />
     <Compile Include="Models\Device_Customer_Store.cs" />
     <Compile Include="Models\Device_Data.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Models\Device_Customer.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Mapping\Cinema_SellInfoMap.cs" />
     <Compile Include="Models\Mapping\Cloud_YS_UserMap.cs" />
     <Compile Include="Models\Mapping\Device_Customer_StoreMap.cs" />
     <Compile Include="Models\Mapping\Device_DataMap.cs" />
@@ -7480,6 +7482,7 @@
     <Content Include="Views\Home\StoreDeviceSet.cshtml" />
     <Content Include="Views\Home\DeviceDataView.cshtml" />
     <Content Include="Views\Device\DeviceData.cshtml" />
+    <Content Include="Views\Device\CinemaDevice.cshtml" />
     <None Include="Web References\WebComSvc\SerialPort.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

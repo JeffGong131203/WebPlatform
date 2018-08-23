@@ -18,6 +18,189 @@ namespace WebPlatform.Controllers
         private WebPlatformContext db = new WebPlatformContext();
         private WebPlatformDataContext dbData = new WebPlatformDataContext();
 
+        /// <summary>
+        /// 影院汇总页面
+        /// </summary>
+        /// <param name="cusID"></param>
+        /// <param name="AreaID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult CinemaDevice(Guid cusID, Guid AreaID)
+        {
+            //Get ALL Cinema Hall
+            IEnumerable<Portal_Customer_Store> storeList = db.Portal_Customer_Store.Where(s => s.AreaID == AreaID);
+
+            ArrayList retArray = new ArrayList();
+
+            DateTime selDate = DateTime.Now.AddDays(-10).Date;
+
+            IEnumerable<Cinema_SellInfo> SellList = dbData.Cinema_SellInfo.Where(c => c.StartDate > selDate).OrderBy(c => c.StartDate);
+
+            Portal_Customer cusInfo = db.Portal_Customer.Find(cusID);
+            Portal_Customer_Area areaInfo = db.Portal_Customer_Area.Find(AreaID);
+
+            //影厅当日票房
+            Dictionary<string, int> dicCurSell = new Dictionary<string, int>();
+            foreach (Cinema_SellInfo sellInfo in SellList)
+            {
+                if (sellInfo.StartDate == DateTime.Now.Date)
+                {
+                    if (dicCurSell.Keys.Contains(sellInfo.HallID))
+                    {
+                        dicCurSell[sellInfo.HallID] += sellInfo.SellCount;
+                    }
+                    else
+                    {
+                        dicCurSell.Add(sellInfo.HallID, sellInfo.SellCount);
+                    }
+                }
+            }
+
+            //影院本月日期票房
+            Dictionary<string, int> dicDateSell = new Dictionary<string, int>();
+            foreach (Cinema_SellInfo sellInfo in SellList)
+            {
+                if (dicDateSell.Keys.Contains(sellInfo.StartDate.ToString()))
+                {
+                    dicDateSell[sellInfo.StartDate.ToString()] += sellInfo.SellCount;
+                }
+                else
+                {
+                    dicDateSell.Add(sellInfo.StartDate.ToString(), sellInfo.SellCount);
+                }
+            }
+
+            //影院上月日期票房
+            Dictionary<string, int> dicLastDateSell = new Dictionary<string, int>();
+            Random rd = new Random();
+            foreach (Cinema_SellInfo sellInfo in SellList)
+            {
+                if (dicLastDateSell.Keys.Contains(sellInfo.StartDate.ToString()))
+                {
+                    dicLastDateSell[sellInfo.StartDate.ToString()] += sellInfo.SellCount + rd.Next(-10, 10);
+                }
+                else
+                {
+                    dicLastDateSell.Add(sellInfo.StartDate.ToString(), sellInfo.SellCount + rd.Next(-10, 10));
+                }
+            }
+
+            //平均数
+            decimal avgPm25 = 0;
+            decimal avgTmp = 0;
+            decimal avgWet = 0;
+            int avgCount = 0;
+
+            int toDaySell = 0;
+
+
+            foreach (Portal_Customer_Store s in storeList)
+            {
+                //0:hallid,1:hallname,2:sellcount,3:pm25,4:tmp,5:wet,6:pValue,7:pRate
+                ArrayList dataArray = new ArrayList();
+
+                dataArray.Add(s.ID);
+                dataArray.Add(s.StoreCode);
+                dataArray.Add(s.StoreName);
+                dataArray.Add(dicCurSell[s.StoreCode].ToString());
+
+                toDaySell += dicCurSell[s.StoreCode];
+
+                Guid?[] devIDArray = db.Device_Customer_Store.Where(d => d.StoreID == s.ID).Select(d => d.DeviceID).ToArray();
+                IEnumerable<Device_Info> devList = db.Device_Info.Where(d => devIDArray.Contains(d.ID)).OrderBy(d => d.DevType).OrderBy(d => d.DevCode);
+
+                foreach (Device_Info d in devList)
+                {
+                    if (d.DevType.ToLower() == "air")
+                    {
+                        Dictionary<string, string> dicRet = GetDeviceData(d.ID);
+
+                        ArrayList airArray = new ArrayList();
+                        if (dicRet.ContainsKey("ReciveData"))
+                        {
+                            airArray = ResolveAirDeviceData(dicRet["ReciveData"]);
+                        }
+
+                        if (airArray.Count == 5)
+                        {
+                            //pm25 = retArray[0].ToString();
+                            //tmp = (Convert.ToDecimal(retArray[1]) / 10).ToString();
+                            //wet = retArray[2].ToString();
+                            //co2 = retArray[3].ToString();
+                            //tvoc = retArray[4].ToString();
+
+                            if (Convert.ToDecimal(airArray[0]) + Convert.ToDecimal(airArray[1]) + Convert.ToDecimal(airArray[2]) != 0)
+                            {
+                                dataArray.Add(airArray[0].ToString());
+                                dataArray.Add((Convert.ToDecimal(airArray[1]) / 10).ToString());
+                                dataArray.Add(airArray[2].ToString());
+
+                                avgPm25 += Convert.ToDecimal(airArray[0].ToString());
+                                avgTmp += Convert.ToDecimal(airArray[1]) / 10;
+                                avgWet += Convert.ToDecimal(airArray[2].ToString());
+
+                                avgCount++;
+                            }
+
+
+                            //retArray.Add(airArray[3].ToString());
+                            //retArray.Add(airArray[4].ToString());
+                        }
+                    }
+
+                    //
+                    if (d.DevType.ToLower() == "power")
+                    {
+                        dataArray.Add("");
+                        dataArray.Add("");
+                    }
+
+                }
+
+                //缺设备补足
+                if (dataArray.Count < 9)
+                {
+                    for (int i = dataArray.Count; i < 9; i++)
+                    {
+                        dataArray.Add("0");
+                    }
+                }
+
+                retArray.Add(dataArray);
+
+            }
+
+            //影厅当前数据
+            ViewBag.retArray = retArray;
+            //影院当月日期票房
+            ViewBag.dicDateSell = dicDateSell;
+            //影院上月日期票房
+            ViewBag.dicLastDateSell = dicLastDateSell;
+            //影院当月总电量
+            ViewBag.totalP = "120";
+            //影院上月总电量
+            ViewBag.lastTotalP = "100";
+
+            //影厅名称
+            ViewBag.cinemaName = areaInfo.AreaName;
+
+            //avgPm25
+            ViewBag.avgPm25 = (avgPm25 / avgCount).ToString("#0.00");
+            //avgTmp
+            ViewBag.avgTmp = (avgTmp / avgCount).ToString("#0.00");
+            //avgWet
+            ViewBag.avgWet = (avgWet / avgCount).ToString("#0.00");
+
+            //当日总票房
+            ViewBag.toDaySell = toDaySell;
+
+            ViewBag.cusID = cusID;
+            ViewBag.areaID = AreaID;
+
+
+            return View();
+        }
+
         // GET: Device
         [Authorize]
         public ActionResult Index(string devType)
@@ -255,6 +438,21 @@ namespace WebPlatform.Controllers
             return RedirectToAction("DevCusName", new { devID = deviceInfo.ID });
         }
 
+        private Dictionary<string, string> GetDeviceData(Guid devID)
+        {
+            string sendData = GetSendData(devID);
+            Dictionary<string, string> dicRet = SendData(devID, sendData);
+
+            if (!dicRet.ContainsKey("ReciveData"))
+            {
+                Thread.Sleep(500);
+
+                dicRet = SendData(devID, sendData);
+            }
+
+            return dicRet;
+        }
+
         /// <summary>
         /// 开关状态读取
         /// </summary>
@@ -412,7 +610,7 @@ namespace WebPlatform.Controllers
             return devDataList;
         }
 
-        private IEnumerable GetDeviceDataList(Guid devID,int rowCount)
+        private IEnumerable GetDeviceDataList(Guid devID, int rowCount)
         {
             IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID && dev.SendData.Substring(0, 2).ToUpper().Trim() == dev.ReciveData.Substring(2, 2).ToUpper().Trim()).OrderByDescending(dev => dev.SendTime).Take(rowCount).ToList();
 
@@ -510,6 +708,11 @@ namespace WebPlatform.Controllers
         {
             WebComSvc.SerialPortData spd = new WebComSvc.SerialPortData();
             spd.Url = GetWebComUrl(devID);
+
+            if(!spd.PortStatus())
+            {
+                spd.OpenPort();
+            }
 
             spd.SendData(sendData, devID.ToString());
 
@@ -610,7 +813,7 @@ namespace WebPlatform.Controllers
             string fanModeCode = string.Empty;
             string setTmp = string.Empty;
 
-            if(Request.Form["SEL_Status"] != null)
+            if (Request.Form["SEL_Status"] != null)
             {
                 statusCode = Request.Form["SEL_Status"];
             }
