@@ -1,0 +1,126 @@
+﻿
+@{
+    ViewBag.Title = "VRV空调";
+    Layout = null;
+
+    Dictionary<string, string> dicFanMode = new Dictionary<string, string>();
+    dicFanMode.Add("10", "ll");
+    dicFanMode.Add("20", "l");
+    dicFanMode.Add("30", "m");
+    dicFanMode.Add("40", "h");
+    dicFanMode.Add("50", "hh");
+
+    Dictionary<string, string> dicStatus = new Dictionary<string, string>();
+    dicStatus.Add("0", "关");
+    dicStatus.Add("1", "开");
+
+    Dictionary<string, string> dicMode = new Dictionary<string, string>();
+    dicMode.Add("0", "送风");
+    dicMode.Add("1", "制热");
+    dicMode.Add("2", "制冷");
+    dicMode.Add("7", "除湿");
+
+    Guid devID = ViewBag.DevID;
+    System.Collections.ArrayList retArray = ViewBag.retArray;
+    //System.Collections.ArrayList dataList = ViewBag.dataList;
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
+
+    WebPlatform.Models.Device_Info devInfo = db.Device_Info.Find(devID);
+
+    Dictionary<string, string> devDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(devInfo.PropertyJson);
+
+    //实时数据
+    string setTmp = string.Empty;
+    string tmp = string.Empty;
+    string status = string.Empty;
+    string mode = string.Empty;
+    string fanMode = string.Empty;
+
+    if(retArray.Count>4)
+    {
+        setTmp = retArray[3].ToString();
+        tmp = retArray[4].ToString();
+        status = dicStatus[retArray[1].ToString()];
+        mode = dicStatus[retArray[2].ToString()];
+        fanMode = dicStatus[retArray[0].ToString()];
+    }
+}
+
+<h1>
+    空调面板
+    <small>@devDic["DevCusName"]</small>
+</h1>
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>@setTmp</h3>
+                <p>设置温度</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-bag"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>@tmp</h3>
+                <p>室内温度</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+            <div class="inner">
+                <h3>@status</h3>
+                <p>状态</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-waterdrop"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-purple">
+            <div class="inner">
+                <h3>@mode</h3>
+                <p>模式</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>@fanMode</h3>
+                <p>风机模式</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+</div>

@@ -38,6 +38,29 @@ namespace CRC_Generate
 
         }
 
+        private void btnPatch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string[] strSrc = this.txtInput.Text.Trim().Split("\r\n".ToCharArray());
+                txtList.Text = string.Empty;
+
+                for (int i = 0; i < strSrc.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(strSrc[i].Trim()))
+                    {
+                        txtList.Text += CRC_16(strSrc[i].Trim()) + "\r\n";
+                    }
+                }
+
+                MessageBox.Show("Generate ok.");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         /// <summary>
         /// 计算CRC-16
         /// </summary>
@@ -101,5 +124,7 @@ namespace CRC_Generate
             }
             return bt;
         }
+
+
     }
 }

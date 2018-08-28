@@ -1,0 +1,205 @@
+﻿
+@{
+    ViewBag.Title = "电表";
+    Layout = null;
+
+    Guid devID = ViewBag.DevID;
+    System.Collections.ArrayList retArray = ViewBag.retArray;
+    //System.Collections.ArrayList dataList = ViewBag.dataList;
+
+    WebPlatform.Models.WebPlatformContext db = new WebPlatform.Models.WebPlatformContext();
+
+    WebPlatform.Models.Device_Info devInfo = db.Device_Info.Find(devID);
+
+    Dictionary<string, string> devDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(devInfo.PropertyJson);
+
+    string totalValue = string.Empty;
+    string va = string.Empty;
+    string vb = string.Empty;
+    string vc = string.Empty;
+    string ia = string.Empty;
+    string ib = string.Empty;
+    string ic = string.Empty;
+    string pa = string.Empty;
+    string pb = string.Empty;
+    string pc = string.Empty;
+    string totalP = string.Empty;
+    string ct = string.Empty;
+
+    if(retArray.Count>11)
+    {
+        totalValue = retArray[0].ToString();
+        va = retArray[1].ToString();
+        vb = retArray[2].ToString();
+        vc = retArray[3].ToString();
+
+        ia = (decimal.Parse(retArray[4].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+        ib = (decimal.Parse(retArray[5].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+        ic = (decimal.Parse(retArray[6].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+
+        pa = (decimal.Parse(retArray[7].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+        pb = (decimal.Parse(retArray[8].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+        pc = (decimal.Parse(retArray[9].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+        totalP = (decimal.Parse(retArray[10].ToString()) * decimal.Parse(retArray[11].ToString())).ToString();
+
+    }
+}
+
+<h1>
+    电表
+    <small>@devDic["DevCusName"]</small>
+</h1>
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>@totalValue</h3>
+                <p>总电能</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-bag"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>@va</h3>
+                <p>A相电压</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+            <div class="inner">
+                <h3>@vb</h3>
+                <p>B相电压</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-waterdrop"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-purple">
+            <div class="inner">
+                <h3>@vc</h3>
+                <p>C相电压</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>@ia</h3>
+                <p>A相电流</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>@ib</h3>
+                <p>B相电流</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3>@ic</h3>
+                <p>C相电流</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>@pa</h3>
+                <p>A相功率</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>@pb</h3>
+                <p>B相功率</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>@pc</h3>
+                <p>C相功率</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>@totalP</h3>
+                <p>总功率</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            @*<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>*@
+        </div>
+    </div>
+</div>
+

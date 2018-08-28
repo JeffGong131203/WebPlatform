@@ -38,6 +38,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.txtFunCode = new System.Windows.Forms.TextBox();
             this.txtList = new System.Windows.Forms.TextBox();
+            this.txtInput = new System.Windows.Forms.TextBox();
+            this.btnPatch = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numCount)).BeginInit();
             this.SuspendLayout();
             // 
@@ -128,17 +130,39 @@
             // 
             // txtList
             // 
-            this.txtList.Location = new System.Drawing.Point(14, 49);
+            this.txtList.Location = new System.Drawing.Point(12, 258);
             this.txtList.Multiline = true;
             this.txtList.Name = "txtList";
-            this.txtList.Size = new System.Drawing.Size(473, 257);
+            this.txtList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtList.Size = new System.Drawing.Size(475, 205);
             this.txtList.TabIndex = 10;
+            // 
+            // txtInput
+            // 
+            this.txtInput.Location = new System.Drawing.Point(12, 49);
+            this.txtInput.Multiline = true;
+            this.txtInput.Name = "txtInput";
+            this.txtInput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtInput.Size = new System.Drawing.Size(475, 174);
+            this.txtInput.TabIndex = 11;
+            // 
+            // btnPatch
+            // 
+            this.btnPatch.Location = new System.Drawing.Point(210, 229);
+            this.btnPatch.Name = "btnPatch";
+            this.btnPatch.Size = new System.Drawing.Size(70, 23);
+            this.btnPatch.TabIndex = 12;
+            this.btnPatch.Text = "Generate";
+            this.btnPatch.UseVisualStyleBackColor = true;
+            this.btnPatch.Click += new System.EventHandler(this.btnPatch_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(499, 318);
+            this.ClientSize = new System.Drawing.Size(499, 475);
+            this.Controls.Add(this.btnPatch);
+            this.Controls.Add(this.txtInput);
             this.Controls.Add(this.txtList);
             this.Controls.Add(this.txtFunCode);
             this.Controls.Add(this.label4);
@@ -171,6 +195,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtFunCode;
         private System.Windows.Forms.TextBox txtList;
+        private System.Windows.Forms.TextBox txtInput;
+        private System.Windows.Forms.Button btnPatch;
     }
 }
 

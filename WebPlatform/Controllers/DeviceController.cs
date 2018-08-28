@@ -438,6 +438,11 @@ namespace WebPlatform.Controllers
             return RedirectToAction("DevCusName", new { devID = deviceInfo.ID });
         }
 
+        /// <summary>
+        /// 设备指令交互(单个指令)
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
         private Dictionary<string, string> GetDeviceData(Guid devID)
         {
             string sendData = GetSendData(devID);
@@ -451,6 +456,174 @@ namespace WebPlatform.Controllers
             }
 
             return dicRet;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult PowDeviceData(Guid devID)
+        {
+            IEnumerable<Device_Send> sendDataList = GetSenDataList(devID);
+            ArrayList retArray = new ArrayList();
+
+            foreach (Device_Send send in sendDataList)
+            {
+                Dictionary<string, string> dicRet = SendData(devID, send.SendData);
+
+                if (!dicRet.ContainsKey("ReciveData"))
+                {
+                    Thread.Sleep(500);
+
+                    dicRet = SendData(devID, send.SendData);
+                }
+
+                if(send.SendData.Trim().Contains("00 00 00 04"))//电量
+                {
+                    retArray.Insert(0, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 4))/100);
+                }
+
+                if (send.SendData.Trim().Contains("00 61 00 02"))//A电压
+                {
+                    retArray.Insert(1, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/10);
+                }
+
+                if (send.SendData.Trim().Contains("00 62 00 02"))//B电压
+                {
+                    retArray.Insert(2, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/10);
+                }
+
+                if (send.SendData.Trim().Contains("00 63 00 02"))//C电压
+                {
+                    retArray.Insert(3, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/10);
+                }
+
+                if (send.SendData.Trim().Contains("00 64 00 02"))//A电流
+                {
+                    retArray.Insert(4, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/100);
+                }
+
+                if (send.SendData.Trim().Contains("00 65 00 02"))//B电流
+                {
+                    retArray.Insert(5, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/100);
+                }
+
+                if (send.SendData.Trim().Contains("00 66 00 02"))//C电流
+                {
+                    retArray.Insert(6, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/100);
+                }
+
+                if (send.SendData.Trim().Contains("00 67 00 02"))//A功率
+                {
+                    retArray.Insert(7, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                }
+
+                if (send.SendData.Trim().Contains("00 68 00 02"))//B功率
+                {
+                    retArray.Insert(8, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                }
+
+                if (send.SendData.Trim().Contains("00 69 00 02"))//C功率
+                {
+                    retArray.Insert(9, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                }
+
+                if (send.SendData.Trim().Contains("00 6A 00 02"))//总功率
+                {
+                    retArray.Insert(10, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                }
+
+                if (send.SendData.Trim().Contains("00 8E 00 02"))//电流配比CT
+                {
+                    retArray.Insert(11, ResolvePowDeviceData(dicRet["ReciveData"], 4, 2));
+                }
+            }
+
+            ViewBag.DevID = devID;
+            ViewBag.retArray = retArray;
+
+            return View();
+        }
+
+        /// <summary>
+        /// 电表数据解析
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="start"></param>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        private string ResolvePowDeviceData(string data,int start,int num)
+        {
+            string retStr = string.Empty;
+
+            string[] byteData = data.Replace("0x", "@").Split("@".ToCharArray());
+
+            if (byteData.Length > 8)
+            {
+                string strData = string.Empty;
+                for(int i = start;i<start+num;i++)
+                {
+                    strData += byteData[i];
+                }
+
+                retStr = Int32.Parse(strData, System.Globalization.NumberStyles.HexNumber).ToString();
+            }
+
+            return retStr;
+        }
+
+
+        /// <summary>
+        /// Vrv空调数据读取
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult VrvDeviceData(Guid devID)
+        {
+            Dictionary<string, string> dicRet = GetDeviceData(devID);
+
+            ArrayList retArray = new ArrayList();
+            if (dicRet.ContainsKey("ReciveData"))
+            {
+                retArray = ResolveVrvDeviceData(dicRet["ReciveData"]);
+            }
+
+            ViewBag.DevID = devID;
+            ViewBag.retArray = retArray;
+
+            return View();
+        }
+        
+        
+        /// <summary>
+        /// vrv空调读取数据解析
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private ArrayList ResolveVrvDeviceData(string data)
+        {
+            ArrayList retArray = new ArrayList();
+
+            string[] byteData = data.Replace("0x", "@").Split("@".ToCharArray());
+
+            if (byteData.Length > 15)
+            {
+                //FanMode
+                retArray.Add(byteData[4]);
+                //Status
+                retArray.Add(byteData[5]);
+                //Mode
+                retArray.Add(byteData[7]);
+                //SetTmp
+                retArray.Add(((Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber)*100 + int.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber))/10).ToString());
+                //Tmp
+                retArray.Add(((Int32.Parse(byteData[12], System.Globalization.NumberStyles.HexNumber) * 100 + int.Parse(byteData[13], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
+            }
+
+            return retArray;
         }
 
         /// <summary>
@@ -682,6 +855,15 @@ namespace WebPlatform.Controllers
             ViewBag.dataList = dataList;
 
             return View();
+        }
+
+        private IEnumerable<Device_Send> GetSenDataList(Guid devID)
+        {
+            string sendData = string.Empty;
+
+            IEnumerable<Device_Send> sendDataList = db.Device_Send.Where(dev => dev.DeviceID == devID).OrderBy(dev => dev.SendData).ToList();
+
+            return sendDataList;
         }
 
         private string GetSendData(Guid devID)

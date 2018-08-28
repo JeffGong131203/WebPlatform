@@ -7483,6 +7483,8 @@
     <Content Include="Views\Home\DeviceDataView.cshtml" />
     <Content Include="Views\Device\DeviceData.cshtml" />
     <Content Include="Views\Device\CinemaDevice.cshtml" />
+    <Content Include="Views\Device\VrvDeviceData.cshtml" />
+    <Content Include="Views\Device\PowDeviceData.cshtml" />
     <None Include="Web References\WebComSvc\SerialPort.disco" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
