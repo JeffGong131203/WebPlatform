@@ -40,6 +40,7 @@
             this.txtList = new System.Windows.Forms.TextBox();
             this.txtInput = new System.Windows.Forms.TextBox();
             this.btnPatch = new System.Windows.Forms.Button();
+            this.btnCrc32 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numCount)).BeginInit();
             this.SuspendLayout();
             // 
@@ -148,7 +149,7 @@
             // 
             // btnPatch
             // 
-            this.btnPatch.Location = new System.Drawing.Point(210, 229);
+            this.btnPatch.Location = new System.Drawing.Point(152, 229);
             this.btnPatch.Name = "btnPatch";
             this.btnPatch.Size = new System.Drawing.Size(70, 23);
             this.btnPatch.TabIndex = 12;
@@ -156,11 +157,22 @@
             this.btnPatch.UseVisualStyleBackColor = true;
             this.btnPatch.Click += new System.EventHandler(this.btnPatch_Click);
             // 
+            // btnCrc32
+            // 
+            this.btnCrc32.Location = new System.Drawing.Point(277, 229);
+            this.btnCrc32.Name = "btnCrc32";
+            this.btnCrc32.Size = new System.Drawing.Size(75, 23);
+            this.btnCrc32.TabIndex = 13;
+            this.btnCrc32.Text = "CRC32 Test";
+            this.btnCrc32.UseVisualStyleBackColor = true;
+            this.btnCrc32.Click += new System.EventHandler(this.btnCrc32_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(499, 475);
+            this.Controls.Add(this.btnCrc32);
             this.Controls.Add(this.btnPatch);
             this.Controls.Add(this.txtInput);
             this.Controls.Add(this.txtList);
@@ -197,6 +209,7 @@
         private System.Windows.Forms.TextBox txtList;
         private System.Windows.Forms.TextBox txtInput;
         private System.Windows.Forms.Button btnPatch;
+        private System.Windows.Forms.Button btnCrc32;
     }
 }
 

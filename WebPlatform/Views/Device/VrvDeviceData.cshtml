@@ -11,14 +11,14 @@
     dicFanMode.Add("50", "hh");
 
     Dictionary<string, string> dicStatus = new Dictionary<string, string>();
-    dicStatus.Add("0", "关");
-    dicStatus.Add("1", "开");
+    dicStatus.Add("00", "关");
+    dicStatus.Add("01", "开");
 
     Dictionary<string, string> dicMode = new Dictionary<string, string>();
-    dicMode.Add("0", "送风");
-    dicMode.Add("1", "制热");
-    dicMode.Add("2", "制冷");
-    dicMode.Add("7", "除湿");
+    dicMode.Add("00", "送风");
+    dicMode.Add("01", "制热");
+    dicMode.Add("02", "制冷");
+    dicMode.Add("07", "除湿");
 
     Guid devID = ViewBag.DevID;
     System.Collections.ArrayList retArray = ViewBag.retArray;
@@ -37,13 +37,36 @@
     string mode = string.Empty;
     string fanMode = string.Empty;
 
-    if(retArray.Count>4)
+    if (retArray.Count > 4)
     {
         setTmp = retArray[3].ToString();
         tmp = retArray[4].ToString();
-        status = dicStatus[retArray[1].ToString()];
-        mode = dicStatus[retArray[2].ToString()];
-        fanMode = dicStatus[retArray[0].ToString()];
+        if (dicStatus.ContainsKey(retArray[1].ToString()))
+        {
+            status = dicStatus[retArray[1].ToString()];
+        }
+        else
+        {
+            status = retArray[1].ToString();
+        }
+
+        if (dicMode.ContainsKey(retArray[2].ToString()))
+        {
+            mode = dicMode[retArray[2].ToString()];
+        }
+        else
+        {
+            mode = retArray[2].ToString();
+        }
+
+        if (dicFanMode.ContainsKey(retArray[0].ToString()))
+        {
+            fanMode = dicFanMode[retArray[0].ToString()];
+        }
+        else
+        {
+            fanMode = retArray[0].ToString();
+        }
     }
 }
 
@@ -124,3 +147,139 @@
     </div>
     <!-- ./col -->
 </div>
+
+@using (Html.BeginForm("VrvDeviceSet", "Device", new { devID = devID }))
+{
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">设备控制</h3>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>状态</h3>
+                            <p>
+                                <select name="SEL_Status" class="form-control select2" style="width:200px">
+                                    @for (int i = 0; i < dicStatus.Count; i++)
+                                    {
+                                        if (status == dicStatus.ElementAt(i).Value)
+                                        {
+                                            <option value="@dicStatus.ElementAt(i).Key" selected="selected">@dicStatus.ElementAt(i).Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@dicStatus.ElementAt(i).Key">@dicStatus.ElementAt(i).Value</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-open"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>模式</h3>
+                            <p>
+                                <select name="SEL_Mode" class="form-control select2" style="width:200px">
+                                    @for (int i = 0; i < dicMode.Count; i++)
+                                    {
+                                        if (mode == dicMode.ElementAt(i).Value)
+                                        {
+                                            <option value="@dicMode.ElementAt(i).Key" selected="selected">@dicMode.ElementAt(i).Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@dicMode.ElementAt(i).Key">@dicMode.ElementAt(i).Value</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-star"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>风机模式</h3>
+                            <p>
+                                <select name="SEL_FanMode" class="form-control select2" style="width:200px">
+                                    @for (int i = 0; i < dicFanMode.Count; i++)
+                                    {
+                                        if (fanMode == dicFanMode.ElementAt(i).Value)
+                                        {
+                                            <option value="@dicFanMode.ElementAt(i).Key" selected="selected">@dicFanMode.ElementAt(i).Value</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@dicFanMode.ElementAt(i).Key">@dicFanMode.ElementAt(i).Value</option>
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-star"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>设置温度</h3>
+                            <p>
+                                <select name="SEL_SetTmp" class="form-control select2" style="width:200px">
+                                    @for (int i = 5; i <= 35; i++)
+                                    {
+                                        if (string.IsNullOrEmpty(setTmp))
+                                        {
+                                            <option value="@i">@i</option>
+                                        }
+                                        else
+                                        {
+                                            if (int.Parse(setTmp) == i)
+                                            {
+                                                <option value="@i" selected="selected">@i</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-android-star"></i>
+                        </div>
+                        <a href="#" class="small-box-footer"><i class="fa"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-1">
+                    <button type="submit" class="btn btn-block btn-info">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

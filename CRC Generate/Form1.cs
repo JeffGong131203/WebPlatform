@@ -55,7 +55,7 @@ namespace CRC_Generate
 
                 MessageBox.Show("Generate ok.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -73,7 +73,7 @@ namespace CRC_Generate
                 throw new Exception("参数\"data\"长度不合法");
             }
 
-            byte[] tmp = StrToByte(data.Trim());
+            byte[] tmp = StrToByte(data.Replace(" ", ""));
 
             /*
             1、预置16位寄存器为十六进制FFFF（即全为1）。称此寄存器为CRC寄存器； 
@@ -125,6 +125,90 @@ namespace CRC_Generate
             return bt;
         }
 
+        #region 计算CRC校验码
+        /// <summary>
+        /// 计算CRC校验码，并转换为十六进制字符串
+        /// Cyclic Redundancy Check 循环冗余校验码
+        /// 是数据通信领域中最常用的一种差错校验码
+        /// 特征是信息字段和校验字段的长度可以任意选定
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public string CRC16_C(string input)
+        {
+            byte[] data = StrToByte(input.Replace(" ",""));
 
+            byte num = 0xff;
+            byte num2 = 0xff;
+
+            byte num3 = 1;
+            byte num4 = 160;
+            byte[] buffer = data;
+
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                //位异或运算
+                num = (byte)(num ^ buffer[i]);
+
+                for (int j = 0; j <= 7; j++)
+                {
+                    byte num5 = num2;
+                    byte num6 = num;
+
+                    //位右移运算
+                    num2 = (byte)(num2 >> 1);
+                    num = (byte)(num >> 1);
+
+                    //位与运算
+                    if ((num5 & 1) == 1)
+                    {
+                        //位或运算
+                        num = (byte)(num | 0x80);
+                    }
+                    if ((num6 & 1) == 1)
+                    {
+                        num2 = (byte)(num2 ^ num4);
+                        num = (byte)(num ^ num3);
+                    }
+                }
+            }
+            string retStr = string.Empty;
+            //return byteToHexStr(new byte[] { num, num2 }, 2);
+            for (int i = 0; i < data.Length; i++)
+            {
+                retStr += data[i].ToString("X2") + " ";
+            }
+
+            retStr += num.ToString("X2") + " ";
+            retStr += num2.ToString("X2");
+
+            return retStr;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 字节数组转16进制字符串
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        public string byteToHexStr(byte[] bytes, int size)
+        {
+            string returnStr = "";
+            if (bytes != null)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    returnStr += bytes[i].ToString("X2");
+                }
+            }
+            return returnStr;
+        }
+
+
+        private void btnCrc32_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(CRC16_C(this.txtInput.Text));
+        }
     }
 }

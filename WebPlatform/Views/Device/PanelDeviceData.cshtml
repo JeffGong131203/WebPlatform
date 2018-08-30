@@ -5,9 +5,20 @@
     ViewBag.Title = "空调面板";
     Layout = null;
 
-    string[] statusName = new string[] { "关", "开", "防冻启动" };
-    string[] modeName = new string[] { "", "制冷", "制热", "通风" };
-    string[] fanModeName = new string[] { "自动", "高速", "中速", "低速" };
+    Dictionary<string, string> dicStatus = new Dictionary<string, string>();
+    dicStatus.Add("00", "关");
+    dicStatus.Add("01", "开");
+
+    Dictionary<string, string> dicMode = new Dictionary<string, string>();
+    dicMode.Add("01", "制冷");
+    dicMode.Add("02", "制热");
+    dicMode.Add("03", "通风");
+
+    Dictionary<string, string> dicFanMode = new Dictionary<string, string>();
+    dicFanMode.Add("00", "自动");
+    dicFanMode.Add("01", "高速");
+    dicFanMode.Add("02", "中速");
+    dicFanMode.Add("03", "低速");
 
 
     Guid devID = ViewBag.DevID;
@@ -29,11 +40,46 @@
 
     if (retArray.Count > 0)
     {
-        statusCode = retArray[0].ToString();
-        modeCode = retArray[1].ToString();
+        //statusCode = retArray[0].ToString();
+        //modeCode = retArray[1].ToString();
+        //setTmp = retArray[2].ToString();
+        //fanModeCode = retArray[3].ToString();
+        //panelTmp = retArray[6].ToString();
+
         setTmp = retArray[2].ToString();
-        fanModeCode = retArray[3].ToString();
+        if (string.IsNullOrEmpty(setTmp))
+        {
+            setTmp = "0";
+        }
+
         panelTmp = retArray[6].ToString();
+
+        if (dicStatus.ContainsKey(retArray[0].ToString()))
+        {
+            statusCode = dicStatus[retArray[0].ToString()];
+        }
+        else
+        {
+            statusCode = retArray[0].ToString();
+        }
+
+        if (dicMode.ContainsKey(retArray[1].ToString()))
+        {
+            modeCode = dicMode[retArray[1].ToString()];
+        }
+        else
+        {
+            modeCode = retArray[1].ToString();
+        }
+
+        if (dicFanMode.ContainsKey(retArray[3].ToString()))
+        {
+            fanModeCode = dicFanMode[retArray[3].ToString()];
+        }
+        else
+        {
+            fanModeCode = retArray[3].ToString();
+        }
     }
 
     //图表数据处理
@@ -116,7 +162,7 @@
         <!-- small box -->
         <div class="small-box bg-aqua">
             <div class="inner">
-                <h3>@statusName[int.Parse(statusCode)]</h3>
+                <h3>@statusCode</h3>
                 <p>状态</p>
             </div>
             <div class="icon">
@@ -130,7 +176,7 @@
         <!-- small box -->
         <div class="small-box bg-purple">
             <div class="inner">
-                <h3>@modeName[int.Parse(modeCode)]</h3>
+                <h3>@modeCode</h3>
                 <p>模式</p>
             </div>
             <div class="icon">
@@ -145,7 +191,7 @@
         <!-- small box -->
         <div class="small-box bg-red">
             <div class="inner">
-                <h3>@fanModeName[int.Parse(fanModeCode)]</h3>
+                <h3>@fanModeCode</h3>
                 <p>风机模式</p>
             </div>
             <div class="icon">
@@ -176,15 +222,15 @@
                             <h3>状态</h3>
                             <p>
                                 <select name="SEL_Status" class="form-control select2" style="width:200px">
-                                    @for (int i = 0; i < statusName.Length; i++)
+                                    @for (int i = 0; i < dicStatus.Count; i++)
                                     {
-                                        if (int.Parse(statusCode) == i)
+                                        if (statusCode == dicStatus.ElementAt(i).Value)
                                         {
-                                            <option value="@i" selected="selected">@statusName[i]</option>
+                                            <option value="@dicStatus.ElementAt(i).Key" selected="selected">@dicStatus.ElementAt(i).Value</option>
                                         }
                                         else
                                         {
-                                            <option value="@i">@statusName[i]</option>
+                                            <option value="@dicStatus.ElementAt(i).Key">@dicStatus.ElementAt(i).Value</option>
                                         }
                                     }
                                 </select>
@@ -202,15 +248,15 @@
                             <h3>模式</h3>
                             <p>
                                 <select name="SEL_Mode" class="form-control select2" style="width:200px">
-                                    @for (int i = 0; i < modeName.Length; i++)
+                                    @for (int i = 0; i < dicMode.Count; i++)
                                     {
-                                        if (int.Parse(modeCode) == i)
+                                        if (modeCode == dicMode.ElementAt(i).Value)
                                         {
-                                            <option value="@i" selected="selected">@modeName[i]</option>
+                                            <option value="@dicMode.ElementAt(i).Key" selected="selected">@dicMode.ElementAt(i).Value</option>
                                         }
                                         else
                                         {
-                                            <option value="@i">@modeName[i]</option>
+                                            <option value="@dicMode.ElementAt(i).Key">@dicMode.ElementAt(i).Value</option>
                                         }
                                     }
                                 </select>
@@ -228,15 +274,15 @@
                             <h3>风机模式</h3>
                             <p>
                                 <select name="SEL_FanMode" class="form-control select2" style="width:200px">
-                                    @for (int i = 0; i < fanModeName.Length; i++)
+                                    @for (int i = 0; i < dicFanMode.Count; i++)
                                     {
-                                        if (int.Parse(fanModeCode) == i)
+                                        if (fanModeCode == dicFanMode.ElementAt(i).Value)
                                         {
-                                            <option value="@i" selected="selected">@fanModeName[i]</option>
+                                            <option value="@dicFanMode.ElementAt(i).Key" selected="selected">@dicFanMode.ElementAt(i).Value</option>
                                         }
                                         else
                                         {
-                                            <option value="@i">@fanModeName[i]</option>
+                                            <option value="@dicFanMode.ElementAt(i).Key">@dicFanMode.ElementAt(i).Value</option>
                                         }
                                     }
                                 </select>
@@ -254,15 +300,22 @@
                             <h3>设置温度</h3>
                             <p>
                                 <select name="SEL_SetTmp" class="form-control select2" style="width:200px">
-                                    @for (int i = 16; i <= 30; i++)
+                                    @for (int i = 5; i <= 35; i++)
                                     {
-                                        if (Convert.ToInt32(decimal.Parse(panelTmp)) == i)
+                                        if (string.IsNullOrEmpty(setTmp))
                                         {
-                                            <option value="@i" selected="selected">@i</option>
+                                            <option value="@i">@i</option>
                                         }
                                         else
                                         {
-                                            <option value="@i">@i</option>
+                                            if (int.Parse(setTmp) == i)
+                                            {
+                                                <option value="@i" selected="selected">@i</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
                                         }
                                     }
                                 </select>

@@ -480,59 +480,59 @@ namespace WebPlatform.Controllers
                     dicRet = SendData(devID, send.SendData);
                 }
 
-                if(send.SendData.Trim().Contains("00 00 00 04"))//电量
+                if (send.SendData.Trim().Contains("00 00 00 04"))//电量
                 {
-                    retArray.Insert(0, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 4))/100);
+                    retArray.Insert(0, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 4)) / 100);
                 }
 
                 if (send.SendData.Trim().Contains("00 61 00 02"))//A电压
                 {
-                    retArray.Insert(1, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/10);
+                    retArray.Insert(1, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
                 }
 
                 if (send.SendData.Trim().Contains("00 62 00 02"))//B电压
                 {
-                    retArray.Insert(2, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/10);
+                    retArray.Insert(2, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
                 }
 
                 if (send.SendData.Trim().Contains("00 63 00 02"))//C电压
                 {
-                    retArray.Insert(3, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/10);
+                    retArray.Insert(3, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
                 }
 
                 if (send.SendData.Trim().Contains("00 64 00 02"))//A电流
                 {
-                    retArray.Insert(4, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/100);
+                    retArray.Insert(4, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
                 }
 
                 if (send.SendData.Trim().Contains("00 65 00 02"))//B电流
                 {
-                    retArray.Insert(5, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/100);
+                    retArray.Insert(5, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
                 }
 
                 if (send.SendData.Trim().Contains("00 66 00 02"))//C电流
                 {
-                    retArray.Insert(6, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/100);
+                    retArray.Insert(6, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
                 }
 
                 if (send.SendData.Trim().Contains("00 67 00 02"))//A功率
                 {
-                    retArray.Insert(7, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                    retArray.Insert(7, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
                 }
 
                 if (send.SendData.Trim().Contains("00 68 00 02"))//B功率
                 {
-                    retArray.Insert(8, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                    retArray.Insert(8, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
                 }
 
                 if (send.SendData.Trim().Contains("00 69 00 02"))//C功率
                 {
-                    retArray.Insert(9, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                    retArray.Insert(9, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
                 }
 
                 if (send.SendData.Trim().Contains("00 6A 00 02"))//总功率
                 {
-                    retArray.Insert(10, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2))/1000);
+                    retArray.Insert(10, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
                 }
 
                 if (send.SendData.Trim().Contains("00 8E 00 02"))//电流配比CT
@@ -554,7 +554,7 @@ namespace WebPlatform.Controllers
         /// <param name="start"></param>
         /// <param name="num"></param>
         /// <returns></returns>
-        private string ResolvePowDeviceData(string data,int start,int num)
+        private string ResolvePowDeviceData(string data, int start, int num)
         {
             string retStr = string.Empty;
 
@@ -563,7 +563,7 @@ namespace WebPlatform.Controllers
             if (byteData.Length > 8)
             {
                 string strData = string.Empty;
-                for(int i = start;i<start+num;i++)
+                for (int i = start; i < start + num; i++)
                 {
                     strData += byteData[i];
                 }
@@ -574,6 +574,78 @@ namespace WebPlatform.Controllers
             return retStr;
         }
 
+        /// <summary>
+        /// Vrv空调数据设置
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult VrvDeviceSet(Guid devID)
+        {
+            Device_Info device_Info = db.Device_Info.Find(devID);
+            if (device_Info == null)
+            {
+                return HttpNotFound();
+            }
+
+            string statusCode = string.Empty;
+            string modeCode = string.Empty;
+            string fanModeCode = string.Empty;
+            string setTmp = string.Empty;
+
+            if (Request.Form["SEL_Status"] != null)
+            {
+                statusCode = Request.Form["SEL_Status"];
+
+                if(statusCode == "00")
+                {
+                    statusCode = "60";
+                }
+
+                if (statusCode == "01")
+                {
+                    statusCode = "61";
+                }
+            }
+
+            if (Request.Form["SEL_Mode"] != null)
+            {
+                modeCode = Request.Form["SEL_Mode"];
+            }
+
+            if (Request.Form["SEL_FanMode"] != null)
+            {
+                fanModeCode = Request.Form["SEL_FanMode"];
+            }
+
+            if (Request.Form["SEL_SetTmp"] != null)
+            {
+                setTmp = int.Parse(Request.Form["SEL_SetTmp"]).ToString("X2");
+            }
+
+            //01 10 07 D9 00 03 06 10 60 00 02 00 A0 0B 52
+            string sendDataTpl = "{0}06{1}{2}";
+            string sendData = string.Empty;
+            string[] addCode = JsonConvert.DeserializeObject<Dictionary<string, string>>(device_Info.PropertyJson)["addCode"].Split("-".ToCharArray());
+
+            ArrayList sendArray = new ArrayList();
+
+            sendArray.Add(string.Format(sendDataTpl, addCode[0], addCode[1], fanModeCode + statusCode));
+            sendArray.Add(string.Format(sendDataTpl, addCode[0], addCode[1], "00" + modeCode));
+            sendArray.Add(string.Format(sendDataTpl, addCode[0], addCode[1], "00" + setTmp));
+
+
+            //sendData = string.Format(sendDataTpl,addCode[0],addCode[1],fanModeCode+statusCode,modeCode,setTmp);
+
+            foreach(string s in sendArray)
+            {
+                sendData = BLL.BLLHelper.CRC_16(s);
+
+                SendData(devID, sendData);
+            }
+
+            return RedirectToAction("DeviceData", new { ID = devID, devType = "Vrv" });
+        }
 
         /// <summary>
         /// Vrv空调数据读取
@@ -596,8 +668,8 @@ namespace WebPlatform.Controllers
 
             return View();
         }
-        
-        
+
+
         /// <summary>
         /// vrv空调读取数据解析
         /// </summary>
@@ -618,7 +690,7 @@ namespace WebPlatform.Controllers
                 //Mode
                 retArray.Add(byteData[7]);
                 //SetTmp
-                retArray.Add(((Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber)*100 + int.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber))/10).ToString());
+                retArray.Add(((Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber) * 100 + int.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
                 //Tmp
                 retArray.Add(((Int32.Parse(byteData[12], System.Globalization.NumberStyles.HexNumber) * 100 + int.Parse(byteData[13], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
             }
@@ -891,7 +963,7 @@ namespace WebPlatform.Controllers
             WebComSvc.SerialPortData spd = new WebComSvc.SerialPortData();
             spd.Url = GetWebComUrl(devID);
 
-            if(!spd.PortStatus())
+            if (!spd.PortStatus())
             {
                 spd.OpenPort();
             }
@@ -995,32 +1067,78 @@ namespace WebPlatform.Controllers
             string fanModeCode = string.Empty;
             string setTmp = string.Empty;
 
+            /*
+             *     string[] statusName = new string[] { "关", "开", "防冻启动" };
+             *     string[] modeName = new string[] { "", "制冷", "制热", "通风" };
+             *     string[] fanModeName = new string[] { "自动", "高速", "中速", "低速" };
+             */
+
+            ArrayList sendArray = new ArrayList();
+
+            /*
+             * 06 00 02 
+             * 00：关、01：开
+            */
             if (Request.Form["SEL_Status"] != null)
             {
                 statusCode = Request.Form["SEL_Status"];
+
+                if(string.IsNullOrEmpty(statusCode))
+                {
+                    sendArray.Add("06000200"+statusCode);
+                }
             }
 
+            /*
+             * 06 00 03 
+             * 1：制冷、2：制热、3：通风；
+            */
             if (Request.Form["SEL_Mode"] != null)
             {
                 modeCode = Request.Form["SEL_Mode"];
+
+                if (string.IsNullOrEmpty(modeCode))
+                {
+                    sendArray.Add("06000300" + modeCode);
+                }
+
             }
 
+            /*
+             * 06 00 05 
+             * 01：高速、02：中速、03：低速、00：自动；
+            */
             if (Request.Form["SEL_FanMode"] != null)
             {
                 fanModeCode = Request.Form["SEL_FanMode"];
+
+                if (string.IsNullOrEmpty(fanModeCode))
+                {
+                    sendArray.Add("06000500" + fanModeCode);
+                }
+
             }
 
+            /*
+             * 06 00 04 
+             * 5-35；
+            */
             if (Request.Form["SEL_SetTmp"] != null)
             {
-                setTmp = Request.Form["SEL_SetTmp"];
+                setTmp = int.Parse(Request.Form["SEL_SetTmp"]).ToString("X2");
+
+                sendArray.Add("06000400" + setTmp);
             }
 
-            //string sendData = string.Empty;
-            //string addCode = JsonConvert.DeserializeObject<Dictionary<string, string>>(device_Info.PropertyJson)["addCode"];
+            string sendData = string.Empty;
+            string addCode = JsonConvert.DeserializeObject<Dictionary<string, string>>(device_Info.PropertyJson)["addCode"];
 
-            //sendData = BLL.BLLHelper.CRC_16(addCode + "03" + setCode + setValue);
+            foreach (string s in sendArray)
+            {
+                sendData = BLL.BLLHelper.CRC_16(addCode + s);
 
-            //SendData(devID, sendData);
+                SendData(devID, sendData);
+            }
 
             return RedirectToAction("DeviceData", new { ID = devID, devType = "Panel" });
         }
