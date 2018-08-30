@@ -136,7 +136,7 @@ namespace CRC_Generate
         /// <returns></returns>
         public string CRC16_C(string input)
         {
-            byte[] data = StrToByte(input.Replace(" ",""));
+            byte[] data = StrToByte(input.Replace(" ", ""));
 
             byte num = 0xff;
             byte num2 = 0xff;
@@ -209,6 +209,18 @@ namespace CRC_Generate
         private void btnCrc32_Click(object sender, EventArgs e)
         {
             MessageBox.Show(CRC16_C(this.txtInput.Text));
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            string a = "01";
+            string b = "0E";
+
+            MessageBox.Show(Convert.ToString(Convert.ToInt32(a, 16), 2));
+            MessageBox.Show(Convert.ToString(Convert.ToInt32(b, 16), 2));
+
+            Int32 a1 = Convert.ToInt32(Convert.ToString(Convert.ToInt32(a, 16), 2), 2);
+            Int32 a2 = Convert.ToInt32(Convert.ToString(Convert.ToInt32(b, 16), 2), 2);
         }
     }
 }

@@ -690,9 +690,9 @@ namespace WebPlatform.Controllers
                 //Mode
                 retArray.Add(byteData[7]);
                 //SetTmp
-                retArray.Add(((Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber) * 100 + int.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
+                retArray.Add(((Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber) * 256 + int.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
                 //Tmp
-                retArray.Add(((Int32.Parse(byteData[12], System.Globalization.NumberStyles.HexNumber) * 100 + int.Parse(byteData[13], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
+                retArray.Add(((Int32.Parse(byteData[12], System.Globalization.NumberStyles.HexNumber) * 256 + int.Parse(byteData[13], System.Globalization.NumberStyles.HexNumber)) / 10).ToString());
             }
 
             return retArray;
