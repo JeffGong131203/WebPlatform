@@ -642,6 +642,8 @@ namespace WebPlatform.Controllers
                 sendData = BLL.BLLHelper.CRC_16(s);
 
                 SendData(devID, sendData);
+
+                Thread.Sleep(500);
             }
 
             return RedirectToAction("DeviceData", new { ID = devID, devType = "Vrv" });
@@ -1138,6 +1140,8 @@ namespace WebPlatform.Controllers
                 sendData = BLL.BLLHelper.CRC_16(addCode + s);
 
                 SendData(devID, sendData);
+
+                Thread.Sleep(500);
             }
 
             return RedirectToAction("DeviceData", new { ID = devID, devType = "Panel" });
@@ -1197,19 +1201,19 @@ namespace WebPlatform.Controllers
             if (byteData.Length > 22)
             {
                 //状态
-                retArray.Add(Int32.Parse(byteData[5], System.Globalization.NumberStyles.HexNumber).ToString());
+                retArray.Add(byteData[5]);
 
                 //模式
-                retArray.Add(Int32.Parse(byteData[7], System.Globalization.NumberStyles.HexNumber).ToString());
+                retArray.Add(byteData[7]);
 
                 //设置温度
                 retArray.Add(Int32.Parse(byteData[8], System.Globalization.NumberStyles.HexNumber).ToString() + "." + Int32.Parse(byteData[9], System.Globalization.NumberStyles.HexNumber).ToString());
 
                 //风机模式
-                retArray.Add(Int32.Parse(byteData[11], System.Globalization.NumberStyles.HexNumber).ToString());
+                retArray.Add(byteData[11]);
 
                 //机型
-                retArray.Add(Int32.Parse(byteData[13], System.Globalization.NumberStyles.HexNumber).ToString());
+                retArray.Add(byteData[13]);
 
                 //低温保护温度
                 retArray.Add(Int32.Parse(byteData[16], System.Globalization.NumberStyles.HexNumber).ToString() + "." + Int32.Parse(byteData[17], System.Globalization.NumberStyles.HexNumber).ToString());
@@ -1218,10 +1222,10 @@ namespace WebPlatform.Controllers
                 retArray.Add(Int32.Parse(byteData[18], System.Globalization.NumberStyles.HexNumber).ToString() + "." + Int32.Parse(byteData[19], System.Globalization.NumberStyles.HexNumber).ToString());
 
                 //防冻功能
-                retArray.Add(Int32.Parse(byteData[23], System.Globalization.NumberStyles.HexNumber).ToString());
+                retArray.Add(byteData[23]);
 
                 //键盘锁定
-                retArray.Add(Int32.Parse(byteData[25], System.Globalization.NumberStyles.HexNumber).ToString());
+                retArray.Add(byteData[25]);
             }
 
             return retArray;
