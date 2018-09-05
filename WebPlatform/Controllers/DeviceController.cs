@@ -537,9 +537,20 @@ namespace WebPlatform.Controllers
 
                 if (send.SendData.Trim().Contains("00 8E 00 02"))//电流配比CT
                 {
-                    retArray.Insert(11, ResolvePowDeviceData(dicRet["ReciveData"], 4, 2));
+                    retArray.Insert(11, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)));
                 }
             }
+
+            retArray[0] = decimal.Parse(retArray[0].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[4] = decimal.Parse(retArray[4].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[5] = decimal.Parse(retArray[5].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[6] = decimal.Parse(retArray[6].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[7] = decimal.Parse(retArray[7].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[8] = decimal.Parse(retArray[8].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[9] = decimal.Parse(retArray[9].ToString()) * decimal.Parse(retArray[11].ToString());
+            retArray[10] = decimal.Parse(retArray[10].ToString()) * decimal.Parse(retArray[11].ToString());
+
+
 
             ViewBag.DevID = devID;
             ViewBag.retArray = retArray;
