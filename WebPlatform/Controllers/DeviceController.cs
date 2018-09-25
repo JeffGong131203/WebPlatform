@@ -459,6 +459,124 @@ namespace WebPlatform.Controllers
         }
 
         /// <summary>
+        /// 获取电表电量、功率最近50条信息
+        /// </summary>
+        /// <param name="devID"></param>
+        /// <returns></returns>
+        private ArrayList PowDeviceDataList(Guid devID)
+        {
+            ArrayList retArrayList = new ArrayList();
+
+            //电流配比
+            decimal ct = 30;
+            IEnumerable devCT = GetDeviceDataList(devID, 1, "00 8E 00 02");
+            foreach (Device_Data dataCt in devCT)
+            {
+                ct = decimal.Parse(ResolvePowDeviceData(dataCt.ReciveData, 4, 2));
+            }
+
+            //电量
+            IEnumerable<Device_Data> devDataList = GetDeviceDataList(devID, 650, "00 00 00 04").Cast<Device_Data>();
+            devDataList = devDataList.OrderBy(d => d.SendTime);
+
+            ArrayList retArrayPower = new ArrayList();
+            ArrayList retArrayPowerDate = new ArrayList();
+            ArrayList retArrayPowerValue = new ArrayList();
+
+            DateTime lastMaxTime = new DateTime(1900, 1, 1);
+            DateTime curSendTime = new DateTime(1900, 1, 1);
+            decimal lastMaxValue = 0;
+            decimal curValue = 0;
+
+            foreach (Device_Data ddata in devDataList)
+            {
+                //第一个
+                if (curSendTime.Year == 1900)
+                {
+                    curSendTime = ddata.SendTime;
+                    curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                }
+
+                //同一时间
+                if (curSendTime.ToString("yyyyMMddhh") == ddata.SendTime.ToString("yyyyMMddhh"))
+                {
+                    curSendTime = ddata.SendTime;
+                    curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                }
+                else
+                {
+                    //第一个计算差额
+                    if (lastMaxTime.Year == 1900)
+                    {
+                        lastMaxTime = curSendTime;
+                        lastMaxValue = curValue;
+
+                        curSendTime = ddata.SendTime;
+                        curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                    }
+                    else
+                    {
+
+                        //入队列
+                        ArrayList retArray = new ArrayList();
+
+                        retArrayPowerDate.Add(lastMaxTime.ToString("yyyy-MM-dd hh"));
+                        retArrayPowerValue.Add(curValue - lastMaxValue);
+
+                        //更新值
+                        lastMaxTime = curSendTime;
+                        lastMaxValue = curValue;
+
+                        curSendTime = ddata.SendTime;
+                        curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                    }
+                }
+            }
+
+            if(retArrayPowerDate.Count > 50 && retArrayPowerValue.Count>50)
+            {
+                retArrayPowerDate.RemoveRange(50, retArrayPowerDate.Count - 50);
+                retArrayPowerValue.RemoveRange(50, retArrayPowerValue.Count - 50);
+            }
+
+            retArrayPower.Add(retArrayPowerDate);
+            retArrayPower.Add(retArrayPowerValue);
+
+
+            //功率
+            IEnumerable devDataListR = GetDeviceDataList(devID, 50, "00 6A 00 02");
+            ArrayList retArrayRate = new ArrayList();
+            ArrayList retArrayDate = new ArrayList();
+            ArrayList retArrayValue = new ArrayList();
+
+            foreach (Device_Data ddata in devDataListR)
+            {
+                retArrayDate.Add(ddata.SendTime.ToString("yyyy-MM-dd hh"));
+                retArrayValue.Add(decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct);
+            }
+
+            retArrayDate.Reverse();
+            retArrayValue.Reverse();
+
+            retArrayRate.Add(retArrayDate);
+            retArrayRate.Add(retArrayValue);
+
+            retArrayList.Add(retArrayPower);
+            retArrayList.Add(retArrayRate);
+
+            return retArrayList;
+        }
+
+        public ActionResult Test()
+        {
+            Guid testID = new Guid("B52ABFF9-8F3D-47A4-97F9-0478F48B1859");
+
+            ArrayList testArr = PowDeviceDataList(testID);
+
+            return Content("ok");
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="devID"></param>
@@ -466,94 +584,105 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult PowDeviceData(Guid devID)
         {
+            
             IEnumerable<Device_Send> sendDataList = GetSenDataList(devID);
             ArrayList retArray = new ArrayList();
 
-            foreach (Device_Send send in sendDataList)
+            try
             {
-                Dictionary<string, string> dicRet = SendData(devID, send.SendData);
-
-                if (!dicRet.ContainsKey("ReciveData"))
+                foreach (Device_Send send in sendDataList)
                 {
-                    Thread.Sleep(500);
+                    Dictionary<string, string> dicRet = SendData(devID, send.SendData);
 
-                    dicRet = SendData(devID, send.SendData);
+                    if (!dicRet.ContainsKey("ReciveData"))
+                    {
+                        Thread.Sleep(500);
+
+                        dicRet = SendData(devID, send.SendData);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 00 00 04"))//电量
+                    {
+                        retArray.Insert(0, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 4)) / 100);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 61 00 02"))//A电压
+                    {
+                        retArray.Insert(1, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 62 00 02"))//B电压
+                    {
+                        retArray.Insert(2, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 63 00 02"))//C电压
+                    {
+                        retArray.Insert(3, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 64 00 02"))//A电流
+                    {
+                        retArray.Insert(4, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 65 00 02"))//B电流
+                    {
+                        retArray.Insert(5, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 66 00 02"))//C电流
+                    {
+                        retArray.Insert(6, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 67 00 02"))//A功率
+                    {
+                        retArray.Insert(7, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 68 00 02"))//B功率
+                    {
+                        retArray.Insert(8, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 69 00 02"))//C功率
+                    {
+                        retArray.Insert(9, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 6A 00 02"))//总功率
+                    {
+                        retArray.Insert(10, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
+                    }
+
+                    if (send.SendData.Trim().Contains("00 8E 00 02"))//电流配比CT
+                    {
+                        retArray.Insert(11, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)));
+                    }
                 }
 
-                if (send.SendData.Trim().Contains("00 00 00 04"))//电量
-                {
-                    retArray.Insert(0, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 4)) / 100);
-                }
-
-                if (send.SendData.Trim().Contains("00 61 00 02"))//A电压
-                {
-                    retArray.Insert(1, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
-                }
-
-                if (send.SendData.Trim().Contains("00 62 00 02"))//B电压
-                {
-                    retArray.Insert(2, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
-                }
-
-                if (send.SendData.Trim().Contains("00 63 00 02"))//C电压
-                {
-                    retArray.Insert(3, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 10);
-                }
-
-                if (send.SendData.Trim().Contains("00 64 00 02"))//A电流
-                {
-                    retArray.Insert(4, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
-                }
-
-                if (send.SendData.Trim().Contains("00 65 00 02"))//B电流
-                {
-                    retArray.Insert(5, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
-                }
-
-                if (send.SendData.Trim().Contains("00 66 00 02"))//C电流
-                {
-                    retArray.Insert(6, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 100);
-                }
-
-                if (send.SendData.Trim().Contains("00 67 00 02"))//A功率
-                {
-                    retArray.Insert(7, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
-                }
-
-                if (send.SendData.Trim().Contains("00 68 00 02"))//B功率
-                {
-                    retArray.Insert(8, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
-                }
-
-                if (send.SendData.Trim().Contains("00 69 00 02"))//C功率
-                {
-                    retArray.Insert(9, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
-                }
-
-                if (send.SendData.Trim().Contains("00 6A 00 02"))//总功率
-                {
-                    retArray.Insert(10, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)) / 1000);
-                }
-
-                if (send.SendData.Trim().Contains("00 8E 00 02"))//电流配比CT
-                {
-                    retArray.Insert(11, decimal.Parse(ResolvePowDeviceData(dicRet["ReciveData"], 4, 2)));
-                }
+                retArray[0] = decimal.Parse(retArray[0].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[4] = decimal.Parse(retArray[4].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[5] = decimal.Parse(retArray[5].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[6] = decimal.Parse(retArray[6].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[7] = decimal.Parse(retArray[7].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[8] = decimal.Parse(retArray[8].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[9] = decimal.Parse(retArray[9].ToString()) * decimal.Parse(retArray[11].ToString());
+                retArray[10] = decimal.Parse(retArray[10].ToString()) * decimal.Parse(retArray[11].ToString());
             }
+            catch { }
 
-            retArray[0] = decimal.Parse(retArray[0].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[4] = decimal.Parse(retArray[4].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[5] = decimal.Parse(retArray[5].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[6] = decimal.Parse(retArray[6].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[7] = decimal.Parse(retArray[7].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[8] = decimal.Parse(retArray[8].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[9] = decimal.Parse(retArray[9].ToString()) * decimal.Parse(retArray[11].ToString());
-            retArray[10] = decimal.Parse(retArray[10].ToString()) * decimal.Parse(retArray[11].ToString());
+            //图形数据List
+            ArrayList retArrayList = PowDeviceDataList(devID);
 
-
+            ArrayList retArrayPowerValue = (ArrayList)retArrayList[0];
+            ArrayList retArrayPowerRate = (ArrayList)retArrayList[1];
 
             ViewBag.DevID = devID;
             ViewBag.retArray = retArray;
+            ViewBag.retArrayPowerValue = retArrayPowerValue;
+            ViewBag.retArrayPowerRate = retArrayPowerRate;
 
             return View();
         }
@@ -608,7 +737,7 @@ namespace WebPlatform.Controllers
             {
                 statusCode = Request.Form["SEL_Status"];
 
-                if(statusCode == "00")
+                if (statusCode == "00")
                 {
                     statusCode = "60";
                 }
@@ -648,7 +777,7 @@ namespace WebPlatform.Controllers
 
             //sendData = string.Format(sendDataTpl,addCode[0],addCode[1],fanModeCode+statusCode,modeCode,setTmp);
 
-            foreach(string s in sendArray)
+            foreach (string s in sendArray)
             {
                 sendData = BLL.BLLHelper.CRC_16(s);
 
@@ -875,6 +1004,13 @@ namespace WebPlatform.Controllers
             return devDataList;
         }
 
+        private IEnumerable GetDeviceDataList(Guid devID, int rowCount, string dataType)
+        {
+            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID && dev.SendData.Substring(0, 2).ToUpper().Trim() == dev.ReciveData.Substring(2, 2).ToUpper().Trim() && dev.SendData.Contains(dataType)).OrderByDescending(dev => dev.SendTime).Take(rowCount).ToList();
+
+            return devDataList;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1096,9 +1232,9 @@ namespace WebPlatform.Controllers
             {
                 statusCode = Request.Form["SEL_Status"];
 
-                if(string.IsNullOrEmpty(statusCode))
+                if (string.IsNullOrEmpty(statusCode))
                 {
-                    sendArray.Add("06000200"+statusCode);
+                    sendArray.Add("06000200" + statusCode);
                 }
             }
 

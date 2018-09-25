@@ -41,7 +41,7 @@ namespace SfcCinemaDataSvc
 
         private void T_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            //string url = "http://report.sfccinema.com/wx/showPlans";
+            //string url = "http://report.sfccinema.com/wx/showPlans?cinemaID=31073101";
             string Formaturl = "http://report.sfccinema.com/wx/showPlans?cinemaID={0}";
             Dictionary<string, string> dicParm = new Dictionary<string, string>();
             string[] cinemaID = System.Configuration.ConfigurationManager.AppSettings["cinemaID"].Split(";".ToCharArray());
