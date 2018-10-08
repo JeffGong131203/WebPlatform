@@ -10,6 +10,38 @@
     int toDaySell = ViewBag.toDaySell;
 
     System.Collections.ArrayList storeArray = ViewBag.retArray;
+
+    System.Collections.ArrayList powerDateArray = ViewBag.powerDateArray;
+    System.Collections.ArrayList powerValueArray = ViewBag.powerValueArray;
+
+    string powerDateJson = Newtonsoft.Json.JsonConvert.SerializeObject(powerDateArray, Newtonsoft.Json.Formatting.Indented);
+    string powerValueJson = Newtonsoft.Json.JsonConvert.SerializeObject(powerValueArray, Newtonsoft.Json.Formatting.Indented);
+
+    Dictionary<string, int> dicDateSell = ViewBag.dicDateSell;
+    Dictionary<string, int> dicLastDateSell = ViewBag.dicLastDateSell;
+
+    System.Collections.ArrayList sellDate = new System.Collections.ArrayList();
+    System.Collections.ArrayList sellValue = new System.Collections.ArrayList();
+    foreach(KeyValuePair<string,int> kp in dicDateSell)
+    {
+        sellDate.Add(kp.Key);
+        sellValue.Add(kp.Value);
+    }
+
+    System.Collections.ArrayList LastsellDate = new System.Collections.ArrayList();
+    System.Collections.ArrayList LastsellValue = new System.Collections.ArrayList();
+    foreach (KeyValuePair<string, int> kp in dicLastDateSell)
+    {
+        LastsellDate.Add(kp.Key);
+        LastsellValue.Add(kp.Value);
+    }
+
+    string sellDateJson = Newtonsoft.Json.JsonConvert.SerializeObject(sellDate, Newtonsoft.Json.Formatting.Indented);
+    string sellValueJson = Newtonsoft.Json.JsonConvert.SerializeObject(sellValue, Newtonsoft.Json.Formatting.Indented);
+
+    string LastsellDateJson = Newtonsoft.Json.JsonConvert.SerializeObject(LastsellDate, Newtonsoft.Json.Formatting.Indented);
+    string LastsellValueJson = Newtonsoft.Json.JsonConvert.SerializeObject(LastsellValue, Newtonsoft.Json.Formatting.Indented);
+
 }
 
 <h2>@ViewBag.cinemaName</h2>
@@ -276,17 +308,17 @@
         var areaChart = new Chart(areaChartCanvas)
 
         var areaChartData = {
-            labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月'],
+            labels: @Html.Raw(powerDateJson),
             datasets: [
                 {
-                    label: 'Electronics',
+                    label: '用电量',
                     fillColor: 'rgba(210, 214, 222, 1)',
                     strokeColor: 'rgba(210, 214, 222, 1)',
                     pointColor: 'rgba(210, 214, 222, 1)',
                     pointStrokeColor: '#c1c7d1',
                     pointHighlightFill: '#fff',
                     pointHighlightStroke: 'rgba(220,220,220,1)',
-                    data: [65, 59, 80, 81, 56, 55, 40]
+                    data: @Html.Raw(powerValueJson)
                 },
                 {
                     label: 'Digital Goods',
@@ -296,7 +328,7 @@
                     pointStrokeColor: 'rgba(60,141,188,1)',
                     pointHighlightFill: '#fff',
                     pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data: [28, 48, 40, 19, 86, 27, 90]
+                    data: @Html.Raw(powerValueJson)
                 }
             ]
         }
@@ -386,7 +418,7 @@
         //- LINE CHART -
         //--------------
         var sellChartData = {
-            labels: ['1', '5', '10', '15', '20', '25', '30'],
+            labels: @Html.Raw(sellDateJson),
             datasets: [
                 {
                     label: '本月票房',
@@ -396,7 +428,7 @@
                     pointStrokeColor: '#c1c7d1',
                     pointHighlightFill: '#fff',
                     pointHighlightStroke: 'rgba(220,220,220,1)',
-                    data: [65, 59, 80, 81, 56, 55, 40]
+                    data: @Html.Raw(sellValueJson)
                 },
                 {
                     label: '上月票房',
@@ -406,7 +438,7 @@
                     pointStrokeColor: 'rgba(60,141,188,1)',
                     pointHighlightFill: '#fff',
                     pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data: [28, 48, 40, 19, 86, 27, 90]
+                    data: @Html.Raw(LastsellValueJson)
                 }
             ]
         }

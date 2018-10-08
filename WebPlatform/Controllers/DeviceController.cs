@@ -31,10 +31,13 @@ namespace WebPlatform.Controllers
             IEnumerable<Portal_Customer_Store> storeList = db.Portal_Customer_Store.Where(s => s.AreaID == AreaID);
 
             ArrayList retArray = new ArrayList();
+            ArrayList retArrayPower = new ArrayList();
 
-            DateTime selDate = DateTime.Now.AddDays(-10).Date;
+            DateTime selDate = DateTime.Now.AddDays(1- DateTime.Now.Day).Date;
+            DateTime LastselDate = DateTime.Now.AddDays(1 - DateTime.Now.Day).AddMonths(-1).Date;
 
-            IEnumerable<Cinema_SellInfo> SellList = dbData.Cinema_SellInfo.Where(c => c.StartDate > selDate).OrderBy(c => c.StartDate);
+            IEnumerable<Cinema_SellInfo> SellList = dbData.Cinema_SellInfo.Where(c => c.StartDate >= selDate).OrderBy(c => c.StartDate);
+            IEnumerable<Cinema_SellInfo> LastSellList = dbData.Cinema_SellInfo.Where(c => c.StartDate >= LastselDate && c.StartDate < selDate).OrderBy(c => c.StartDate);
 
             Portal_Customer cusInfo = db.Portal_Customer.Find(cusID);
             Portal_Customer_Area areaInfo = db.Portal_Customer_Area.Find(AreaID);
@@ -60,28 +63,28 @@ namespace WebPlatform.Controllers
             Dictionary<string, int> dicDateSell = new Dictionary<string, int>();
             foreach (Cinema_SellInfo sellInfo in SellList)
             {
-                if (dicDateSell.Keys.Contains(sellInfo.StartDate.ToString()))
+                if (dicDateSell.Keys.Contains(sellInfo.StartDate.Day.ToString()))
                 {
-                    dicDateSell[sellInfo.StartDate.ToString()] += sellInfo.SellCount;
+                    dicDateSell[sellInfo.StartDate.Day.ToString()] += sellInfo.SellCount;
                 }
                 else
                 {
-                    dicDateSell.Add(sellInfo.StartDate.ToString(), sellInfo.SellCount);
+                    dicDateSell.Add(sellInfo.StartDate.Day.ToString(), sellInfo.SellCount);
                 }
             }
 
             //影院上月日期票房
             Dictionary<string, int> dicLastDateSell = new Dictionary<string, int>();
-            Random rd = new Random();
-            foreach (Cinema_SellInfo sellInfo in SellList)
+
+            foreach (Cinema_SellInfo sellInfo in LastSellList)
             {
-                if (dicLastDateSell.Keys.Contains(sellInfo.StartDate.ToString()))
+                if (dicLastDateSell.Keys.Contains(sellInfo.StartDate.Day.ToString()))
                 {
-                    dicLastDateSell[sellInfo.StartDate.ToString()] += sellInfo.SellCount + rd.Next(-10, 10);
+                    dicLastDateSell[sellInfo.StartDate.Day.ToString()] += sellInfo.SellCount ;
                 }
                 else
                 {
-                    dicLastDateSell.Add(sellInfo.StartDate.ToString(), sellInfo.SellCount + rd.Next(-10, 10));
+                    dicLastDateSell.Add(sellInfo.StartDate.Day.ToString(), sellInfo.SellCount);
                 }
             }
 
@@ -148,13 +151,75 @@ namespace WebPlatform.Controllers
                         }
                     }
 
-                    //
-                    if (d.DevType.ToLower() == "power")
+                    //用电量
+                    if (d.DevType.ToLower() == "pow")
                     {
-                        dataArray.Add("");
-                        dataArray.Add("");
-                    }
+                        //电流配比
+                        decimal ct = 30;
+                        IEnumerable devCT = GetDeviceDataList(d.ID, 1, "00 8E 00 02");
+                        foreach (Device_Data dataCt in devCT)
+                        {
+                            ct = decimal.Parse(ResolvePowDeviceData(dataCt.ReciveData, 4, 2));
+                        }
 
+                        //电量
+                        IEnumerable<Device_Data> devDataList = GetDeviceDataList(d.ID, 1000000, "00 00 00 04").Cast<Device_Data>();
+                        devDataList = devDataList.OrderBy(dev => dev.SendTime);
+
+                        ArrayList retArrayPowerDate = new ArrayList();
+                        ArrayList retArrayPowerValue = new ArrayList();
+
+                        DateTime lastMaxTime = new DateTime(1900, 1, 1);
+                        DateTime curSendTime = new DateTime(1900, 1, 1);
+                        decimal lastMaxValue = 0;
+                        decimal curValue = 0;
+
+                        foreach (Device_Data ddata in devDataList)
+                        {
+                            //第一个
+                            if (curSendTime.Year == 1900)
+                            {
+                                curSendTime = ddata.SendTime;
+                                curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                            }
+
+                            //同一时间
+                            if (curSendTime.ToString("yyyyMM") == ddata.SendTime.ToString("yyyyMM"))
+                            {
+                                curSendTime = ddata.SendTime;
+                                curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                            }
+                            else
+                            {
+                                //第一个计算差额
+                                if (lastMaxTime.Year == 1900)
+                                {
+                                    lastMaxTime = curSendTime;
+                                    lastMaxValue = curValue;
+
+                                    curSendTime = ddata.SendTime;
+                                    curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                                }
+                                else
+                                {
+
+                                    //入队列
+                                    retArrayPowerDate.Add(lastMaxTime.ToString("yyyy-MM"));
+                                    retArrayPowerValue.Add(curValue - lastMaxValue);
+
+                                    //更新值
+                                    lastMaxTime = curSendTime;
+                                    lastMaxValue = curValue;
+
+                                    curSendTime = ddata.SendTime;
+                                    curValue = decimal.Parse(ResolvePowDeviceData(ddata.ReciveData, 4, 4)) / 100 * ct;
+                                }
+                            }
+                        }
+
+                        retArrayPower.Add(retArrayPowerDate);
+                        retArrayPower.Add(retArrayPowerValue);
+                    }
                 }
 
                 //缺设备补足
@@ -170,16 +235,64 @@ namespace WebPlatform.Controllers
 
             }
 
+            ArrayList powerDateArray = new ArrayList();
+            ArrayList powerValueArray = new ArrayList();
+
+            if (retArrayPower.Count > 0)
+            {
+                if (retArrayPower.Count > 2)
+                {
+                    powerDateArray = (ArrayList)retArrayPower[0];
+
+                    for (int i = 1; i <= retArrayPower.Count - 1; i = i + 2)
+                    {
+                        ArrayList pValue = (ArrayList)retArrayPower[i];
+
+                        for (int j = 0; j < pValue.Count; j++)
+                        {
+                            if (powerValueArray.Count > j)
+                            {
+                                powerValueArray[j] = (decimal)powerValueArray[j] + (decimal)pValue[j];
+                            }
+                            else
+                            {
+                                powerValueArray.Add(pValue[j]);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    powerDateArray = (ArrayList)retArrayPower[0];
+                    powerValueArray = (ArrayList)retArrayPower[1];
+                }
+            }
+
+            //电表数据
+            ViewBag.powerDateArray = powerDateArray;
+            ViewBag.powerValueArray = powerValueArray;
+
             //影厅当前数据
             ViewBag.retArray = retArray;
             //影院当月日期票房
             ViewBag.dicDateSell = dicDateSell;
             //影院上月日期票房
             ViewBag.dicLastDateSell = dicLastDateSell;
-            //影院当月总电量
-            ViewBag.totalP = "120";
-            //影院上月总电量
-            ViewBag.lastTotalP = "100";
+
+            if (powerValueArray.Count > 1)
+            {
+                //影院当月总电量
+                ViewBag.totalP = powerValueArray[powerValueArray.Count - 1];
+                //影院上月总电量
+                ViewBag.lastTotalP = powerValueArray[powerValueArray.Count - 2];
+            }
+            else
+            {
+                //影院当月总电量
+                ViewBag.totalP = "0";
+                //影院上月总电量
+                ViewBag.lastTotalP = "0";
+            }
 
             //影厅名称
             ViewBag.cinemaName = areaInfo.AreaName;
@@ -533,7 +646,7 @@ namespace WebPlatform.Controllers
                 }
             }
 
-            if(retArrayPowerDate.Count > 50 && retArrayPowerValue.Count>50)
+            if (retArrayPowerDate.Count > 50 && retArrayPowerValue.Count > 50)
             {
                 retArrayPowerDate.RemoveRange(50, retArrayPowerDate.Count - 50);
                 retArrayPowerValue.RemoveRange(50, retArrayPowerValue.Count - 50);
@@ -584,7 +697,7 @@ namespace WebPlatform.Controllers
         [Authorize]
         public ActionResult PowDeviceData(Guid devID)
         {
-            
+
             IEnumerable<Device_Send> sendDataList = GetSenDataList(devID);
             ArrayList retArray = new ArrayList();
 
@@ -1007,6 +1120,13 @@ namespace WebPlatform.Controllers
         private IEnumerable GetDeviceDataList(Guid devID, int rowCount, string dataType)
         {
             IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID && dev.SendData.Substring(0, 2).ToUpper().Trim() == dev.ReciveData.Substring(2, 2).ToUpper().Trim() && dev.SendData.Contains(dataType)).OrderByDescending(dev => dev.SendTime).Take(rowCount).ToList();
+
+            return devDataList;
+        }
+
+        private IEnumerable GetDeviceDataList(Guid devID, int rowCount, int year, string dataType)
+        {
+            IEnumerable devDataList = dbData.Device_Data.Where(dev => dev.DeviceID == devID && dev.SendData.Substring(0, 2).ToUpper().Trim() == dev.ReciveData.Substring(2, 2).ToUpper().Trim() && dev.SendData.Contains(dataType) && dev.SendTime.Year == year).OrderByDescending(dev => dev.SendTime).Take(rowCount).ToList();
 
             return devDataList;
         }
